@@ -1,5 +1,12 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## TODO Stuff
+1) Change Notes to Coursework and Notes. Have it organized by semester and by subject/area. Add disclaimers for it that it's not notes but high-level summary.
+2) Think about design and cool UI/UX features, especially for landing page.
+3) Add "subscribe to blog" potentially. 
+4) Add user tracking like location. Add commenting ability. 
+5) Add sAhIl.
+
 ## Getting Started
 
 First, run the development server:
