@@ -24,25 +24,41 @@ import Link from 'next/link';
 // Helper function to determine if it\'s night based on hour (simplified)
 // const isNightTime = (hour: number) => hour < 6 || hour >= 20;
 
+// Helper: interpolate between two hex colors
+function lerpColor(a: string, b: string, t: number) {
+  const ah = a.replace('#', '');
+  const bh = b.replace('#', '');
+  const ar = parseInt(ah.substring(0, 2), 16), ag = parseInt(ah.substring(2, 4), 16), ab = parseInt(ah.substring(4, 6), 16);
+  const br = parseInt(bh.substring(0, 2), 16), bg = parseInt(bh.substring(2, 4), 16), bb = parseInt(bh.substring(4, 6), 16);
+  const rr = Math.round(ar + (br - ar) * t);
+  const rg = Math.round(ag + (bg - ag) * t);
+  const rb = Math.round(ab + (bb - ab) * t);
+  return `#${rr.toString(16).padStart(2, '0')}${rg.toString(16).padStart(2, '0')}${rb.toString(16).padStart(2, '0')}`;
+}
+
 // Component to render the star field only on the client
 const StarField = ({ isNight, scrollY }: { isNight: boolean, scrollY: number }) => {
   const [stars, setStars] = useState<Array<{ id: number, style: CSSProperties }>>([]);
 
   // Effect to generate stars only on the client after mount
   useEffect(() => {
-    const generatedStars = Array.from({ length: 100 }).map((_, i) => ({
-      id: i,
-      style: {
-        width: `${Math.random() * 2}px`,
-        height: `${Math.random() * 2}px`,
-        top: `${Math.random() * 100}%`,
-        left: `${Math.random() * 100}%`,
-        opacity: Math.random(),
-        animation: `twinkle ${Math.random() * 5 + 5}s ease-in-out infinite alternate`,
-      }
-    }));
+    const generatedStars = Array.from({ length: 350 }).map((_, i) => {
+      const size = Math.random() * 1.5 + 0.5;
+      return {
+        id: i,
+        style: {
+          width: `${size}px`,
+          height: `${size}px`,
+          top: `${Math.pow(Math.random(), 1.5) * 100}%`, // more stars near horizon
+          left: `${Math.random() * 100}%`,
+          opacity: Math.random() * 0.7 + 0.3,
+          animation: `twinkle ${Math.random() * 5 + 5}s ease-in-out infinite alternate`,
+          filter: 'blur(0.5px)',
+        }
+      };
+    });
     setStars(generatedStars);
-  }, []); // Empty dependency array ensures this runs only once on mount
+  }, []);
 
   // Render stars only if it's night and the stars array is populated
   if (!isNight || stars.length === 0) {
@@ -50,7 +66,7 @@ const StarField = ({ isNight, scrollY }: { isNight: boolean, scrollY: number }) 
   }
 
   return (
-    <div className="absolute inset-0 z-[-2]" style={{ opacity: 1 - (scrollY * 0.001) }}>
+    <div className="absolute inset-0 z-[-2] pointer-events-none" style={{ opacity: 1 - (scrollY * 0.001) }}>
       {stars.map((star) => (
         <div
           key={star.id}
@@ -72,7 +88,7 @@ const MountainTrees = ({ colorClass, density, mountainHeight, scrollFactor }: { 
     const generatedTrees = Array.from({ length: density }).map((_, i) => ({
       id: i,
       style: {
-        position: 'absolute',
+        position: 'absolute' as CSSProperties['position'],
         // Random horizontal position across the mountain width
         left: `${Math.random() * 100}%`,
         // Random vertical position near the top of the mountain layer, adjusted for perceived perspective
@@ -114,7 +130,8 @@ const MountainTrees = ({ colorClass, density, mountainHeight, scrollFactor }: { 
 
 export default function Home() {
   const [scrollY, setScrollY] = useState(0);
-  const [sunPosition, setSunPosition] = useState({ top: '16px', left: '50%' });
+  const [sunPosition, setSunPosition] = useState({ top: '16px', left: '50%', visible: false });
+  const [moonPosition, setMoonPosition] = useState({ top: '16px', left: '50%', visible: false });
   const [isNight, setIsNight] = useState(false);
   const [farMountainColor, setFarMountainColor] = useState('#9095b3'); // Default to Alto's day color
   const [middleMountainColor, setMiddleMountainColor] = useState('#7a7f9e'); // Default to Alto's day color
@@ -123,6 +140,25 @@ export default function Home() {
   const [farTreeColor, setFarTreeColor] = useState('bg-alto-tree-day');
   const [middleTreeColor, setMiddleTreeColor] = useState('bg-alto-tree-day');
   const [closeTreeColor, setCloseTreeColor] = useState('bg-alto-tree-day');
+
+  const [skyColor, setSkyColor] = useState('#87ceeb');
+  const [arcCenterY, setArcCenterY] = useState(400); // Default value
+
+  // Add useEffect to handle window dimensions
+  useEffect(() => {
+    const updateDimensions = () => {
+      setArcCenterY(window.innerHeight / 2);
+    };
+    
+    // Set initial dimensions
+    updateDimensions();
+    
+    // Add event listener
+    window.addEventListener('resize', updateDimensions);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, []);
 
   // Effect for parallax scrolling
   useEffect(() => {
@@ -133,114 +169,182 @@ export default function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Effect for sun/moon position, night detection, and sky color
+  // Fast sun/moon cycle, color, and phase
   useEffect(() => {
-    const updateCelestialPosition = () => {
-      // Use real time
-      const now = new Date();
-      const hour = now.getHours();
-      const minute = now.getMinutes();
-
-      // Determine if it's night based on hour
-      const isNightTime = hour < 6 || hour >= 20;
-      setIsNight(isNightTime);
-
-      // Determine mountain colors based on time of day
-      let farMountainHex = '#9095b3'; // default day color
-      let middleMountainHex = '#7a7f9e'; // default day color
-      let closeMountainHex = '#6a6b85'; // default day color
-
-      if (hour >= 0 && hour < 6) { // Night to Dawn
-        farMountainHex = '#2b304d';
-        middleMountainHex = '#4a4e69';
-        closeMountainHex = '#5a5d77';
-      } else if (hour >= 6 && hour < 8) { // Dawn
-        farMountainHex = '#e3a975';
-        middleMountainHex = '#eacb8a';
-        closeMountainHex = '#f5d6a1';
-      } else if (hour >= 17 && hour < 20) { // Sunset to Dusk
-        farMountainHex = '#fb8b24';
-        middleMountainHex = '#ffb703';
-        closeMountainHex = '#f5d6a1'; // Reusing a similar warm tone
-      } else if (hour >= 20) { // Night
-        farMountainHex = '#2b304d';
-        middleMountainHex = '#4a4e69';
-        closeMountainHex = '#5a5d77';
-      }
-
-      // Set mountain colors using hex codes for inline style
+    let animationFrame: number;
+    function updateCelestial() {
+      const now = performance.now();
+      const fastMinutes = ((now / 1000) % 120) / 120 * 1440;
+      const dayProgress = fastMinutes / 1440;
+      const sunAngle = dayProgress * 2 * Math.PI - Math.PI / 2;
+      const moonAngle = sunAngle + Math.PI;
+      const arcRadius = arcCenterY * 0.7;
+      
+      setSunPosition({
+        top: `${arcCenterY - arcRadius * Math.sin(sunAngle)}px`,
+        left: `${50 + 35 * Math.cos(sunAngle)}%`,
+        visible: arcCenterY - arcRadius * Math.sin(sunAngle) < arcCenterY
+      });
+      
+      setMoonPosition({
+        top: `${arcCenterY - arcRadius * Math.sin(moonAngle)}px`,
+        left: `${50 + 35 * Math.cos(moonAngle)}%`,
+        visible: arcCenterY - arcRadius * Math.sin(moonAngle) < arcCenterY
+      });
+      
+      // Night detection
+      const hour = Math.floor(fastMinutes / 60);
+      setIsNight(hour < 6 || hour >= 20);
+      // Mountain and tree colors (unchanged)
+      let farMountainHex = '#9095b3', middleMountainHex = '#7a7f9e', closeMountainHex = '#6a6b85';
+      if (hour >= 0 && hour < 6) { farMountainHex = '#2b304d'; middleMountainHex = '#4a4e69'; closeMountainHex = '#5a5d77'; }
+      else if (hour >= 6 && hour < 8) { farMountainHex = '#e3a975'; middleMountainHex = '#eacb8a'; closeMountainHex = '#f5d6a1'; }
+      else if (hour >= 17 && hour < 20) { farMountainHex = '#fb8b24'; middleMountainHex = '#ffb703'; closeMountainHex = '#f5d6a1'; }
+      else if (hour >= 20) { farMountainHex = '#2b304d'; middleMountainHex = '#4a4e69'; closeMountainHex = '#5a5d77'; }
       setFarMountainColor(farMountainHex);
       setMiddleMountainColor(middleMountainHex);
       setCloseMountainColor(closeMountainHex);
-
-      // Determine tree colors based on time of day
       let treeColor = 'bg-alto-tree-day';
+      if (hour >= 0 && hour < 6) treeColor = 'bg-alto-tree-night';
+      else if (hour >= 6 && hour < 8) treeColor = 'bg-alto-tree-dawn';
+      else if (hour >= 17 && hour < 20) treeColor = 'bg-alto-tree-dusk';
+      else if (hour >= 20) treeColor = 'bg-alto-tree-night';
+      setFarTreeColor(treeColor); setMiddleTreeColor(treeColor); setCloseTreeColor(treeColor);
+      animationFrame = requestAnimationFrame(updateCelestial);
+    }
+    animationFrame = requestAnimationFrame(updateCelestial);
+    return () => cancelAnimationFrame(animationFrame);
+  }, [arcCenterY]);
 
-      if (hour >= 0 && hour < 6) { // Night to Dawn
-        treeColor = 'bg-alto-tree-night';
-      } else if (hour >= 6 && hour < 8) { // Dawn
-        treeColor = 'bg-alto-tree-dawn';
-      } else if (hour >= 17 && hour < 20) { // Sunset to Dusk
-        treeColor = 'bg-alto-tree-dusk';
-      } else if (hour >= 20) { // Night
-        treeColor = 'bg-alto-tree-night';
-      }
-
-      setFarTreeColor(treeColor);
-      setMiddleTreeColor(treeColor);
-      setCloseTreeColor(treeColor);
-
-      // Calculate sun/moon position based on time
-      const totalMinutes = hour * 60 + minute;
-      const totalMinutesInDay = 24 * 60;
-
-      const dayProgress = totalMinutes / totalMinutesInDay; // 0 to 1
-
-      // Adjust progress for non-linear path (e.g., higher in the middle)
-      const verticalProgress = Math.sin(dayProgress * Math.PI);
-
-      // Simple linear left movement
-      const left = `${dayProgress * 100}%`;
-
-      // Vertical movement: starts low, goes up, comes down. Adjusted for a reasonable range.
-      const minTop = 10; // vh
-      const maxTop = 70; // vh
-      const top = `${maxTop - verticalProgress * (maxTop - minTop)}vh`;
-
-      setSunPosition({ top, left });
-    };
-
-    // Update immediately and then every minute
-    updateCelestialPosition();
-    const intervalId = setInterval(updateCelestialPosition, 60000); // Update every minute
-
-    return () => clearInterval(intervalId);
-  }, []); // Empty dependency array means this effect runs once on mount
+  useEffect(() => {
+    const sunY = parseFloat(sunPosition.top);
+    const sunRadius = 48;
+    const horizonY = arcCenterY;
+    let sunOpacity = 1;
+    if (sunY + sunRadius > horizonY) {
+      sunOpacity = 0;
+    } else if (sunY + sunRadius > horizonY - sunRadius * 2) {
+      sunOpacity = 1 - ((sunY + sunRadius - (horizonY - sunRadius * 2)) / (sunRadius * 2));
+    }
+    // Color stops
+    const day = '#87ceeb';
+    const dusk = '#e3a975';
+    const night = '#1a1e33';
+    let bg;
+    if (sunOpacity > 0.7) {
+      bg = lerpColor(day, dusk, (1 - sunOpacity) / 0.3);
+    } else if (sunOpacity > 0.2) {
+      bg = lerpColor(dusk, night, (0.7 - sunOpacity) / 0.5);
+    } else {
+      bg = night;
+    }
+    setSkyColor(bg);
+    // Mountain color stops
+    const farDay = '#9095b3', farDusk = '#eacb8a', farNight = '#2b304d';
+    const midDay = '#7a7f9e', midDusk = '#e3a975', midNight = '#4a4e69';
+    const closeDay = '#6a6b85', closeDusk = '#f5d6a1', closeNight = '#5a5d77';
+    let far, mid, close;
+    if (sunOpacity > 0.7) {
+      far = lerpColor(farDay, farDusk, (1 - sunOpacity) / 0.3);
+      mid = lerpColor(midDay, midDusk, (1 - sunOpacity) / 0.3);
+      close = lerpColor(closeDay, closeDusk, (1 - sunOpacity) / 0.3);
+    } else if (sunOpacity > 0.2) {
+      far = lerpColor(farDusk, farNight, (0.7 - sunOpacity) / 0.5);
+      mid = lerpColor(midDusk, midNight, (0.7 - sunOpacity) / 0.5);
+      close = lerpColor(closeDusk, closeNight, (0.7 - sunOpacity) / 0.5);
+    } else {
+      far = farNight;
+      mid = midNight;
+      close = closeNight;
+    }
+    setFarMountainColor(far);
+    setMiddleMountainColor(mid);
+    setCloseMountainColor(close);
+  }, [sunPosition, arcCenterY]);
 
   return (
     <div className="relative min-h-screen overflow-hidden">
-      {/* Sky Background */}
-      <div 
+      {/* Sky Background - color based on sun fade */}
+      <div
         className="fixed inset-0 transition-colors duration-1000"
-        style={{ 
-          zIndex: -1,
-          backgroundColor: isNight ? '#1a1e33' : '#87ceeb' // Night: dark blue, Day: light blue
-        }}
+        style={{ zIndex: -1, backgroundColor: skyColor }}
       />
 
       {/* Star Field - Rendered as a separate component */}
       <StarField isNight={isNight} scrollY={scrollY} />
 
-      {/* Sun/Moon */}
-      <div
-        className={`absolute w-24 h-24 rounded-full z-10 transition-colors duration-1000 ${isNight ? 'bg-gray-300 shadow-[0_0_30px_10px_#d1d5db]' : 'bg-[#f5d6a1] shadow-[0_0_30px_10px_#f5d6a1]'}`}
-        style={{
-          top: sunPosition.top,
-          left: sunPosition.left,
-          transform: `translate(-50%, ${scrollY * 0.2}px)`,
-          opacity: 1 - (scrollY * 0.003)
-        }}
-      />
+      {/* Sun/Moon - Rendered behind close mountain */}
+      <div style={{ position: 'absolute', width: '100%', height: '100%', zIndex: 5, pointerEvents: 'none' }}>
+        {/* Sun */}
+        {(() => {
+          const sunY = parseFloat(sunPosition.top);
+          const sunRadius = 48; // px (half of w-24)
+          const horizonY = arcCenterY; // middle of the page
+          let sunOpacity = 1;
+          if (sunY + sunRadius > horizonY) {
+            sunOpacity = 0;
+          } else if (sunY + sunRadius > horizonY - sunRadius * 2) {
+            sunOpacity = 1 - ((sunY + sunRadius - (horizonY - sunRadius * 2)) / (sunRadius * 2));
+          }
+          return (
+            <div
+              className={`absolute w-24 h-24 rounded-full transition-colors duration-1000 ${isNight ? 'bg-gray-300 shadow-[0_0_30px_10px_#d1d5db]' : 'bg-[#f5d6a1] shadow-[0_0_30px_10px_#f5d6a1]'}`}
+              style={{
+                top: sunPosition.top,
+                left: sunPosition.left,
+                transform: `translate(-50%, ${scrollY * 0.2}px)`,
+                opacity: sunOpacity * (1 - (scrollY * 0.003)),
+              }}
+            />
+          );
+        })()}
+        {/* Moon (thinner crescent) */}
+        {(() => {
+          const moonY = parseFloat(moonPosition.top);
+          const moonRadius = 28; // px (half of 56px)
+          const horizonY = arcCenterY;
+          let moonOpacity = 1;
+          if (moonY + moonRadius > horizonY) {
+            moonOpacity = 0;
+          } else if (moonY + moonRadius > horizonY - moonRadius * 2) {
+            moonOpacity = 1 - ((moonY + moonRadius - (horizonY - moonRadius * 2)) / (moonRadius * 2));
+          }
+          return (
+            <div
+              style={{
+                position: 'absolute',
+                width: '56px',
+                height: '56px',
+                borderRadius: '50%',
+                background: 'radial-gradient(ellipse at 60% 40%, #e0e7ef 80%, #b6b8c9 100%)',
+                boxShadow: '0 0 32px 8px #b6b8c9cc',
+                top: moonPosition.top,
+                left: moonPosition.left,
+                zIndex: 20,
+                transform: 'translate(-50%, -50%)',
+                overflow: 'hidden',
+                opacity: moonOpacity,
+              }}
+              aria-label="Moon"
+            >
+              {/* Thinner crescent mask */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: '55%',
+                  width: '50%',
+                  height: '100%',
+                  background: '#232946',
+                  borderRadius: '50%',
+                  boxShadow: '0 0 32px 8px #232946',
+                  opacity: 0.85,
+                }}
+              />
+            </div>
+          );
+        })()}
+      </div>
 
       {/* Mountain Background - Using Tailwind classes for colors */}
       <div className="absolute bottom-0 left-0 w-full h-[70vh] z-0">
@@ -289,7 +393,8 @@ export default function Home() {
             height: '40vh',
             clipPath: "polygon(0% 100%, 100% 100%, 100% 55%, 90% 45%, 75% 50%, 60% 40%, 45% 50%, 30% 45%, 15% 50%, 0% 40%)",
             backgroundColor: closeMountainColor, // Use inline style with hex color
-            transform: `translateY(${scrollY * 0.3}px)`
+            transform: `translateY(${scrollY * 0.3}px)`,
+            zIndex: 10,
           }}
         >
           {/* Trees for Close Mountains */}

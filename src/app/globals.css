@@ -76,9 +76,9 @@
   --sidebar-accent-foreground: oklch(0.216 0.006 56.043);
   --sidebar-border: oklch(0.923 0.003 48.717);
   --sidebar-ring: oklch(0.709 0.01 56.259);
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 0, 0, 0;
+  --background-end-rgb: 0, 0, 0;
   --gradient-from: #4a4e69;
   --gradient-to: #6a6b85;
 }
@@ -127,6 +127,12 @@
 
 body {
   color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+    to bottom,
+    rgb(var(--background-start-rgb)),
+    rgb(var(--background-end-rgb))
+  );
+  min-height: 100vh;
   transition: background-color 1000ms ease-in-out;
 }
 
@@ -146,6 +152,52 @@ body {
 }
 
 @keyframes twinkle {
-  0%, 100% { opacity: 0.5; }
+  0% { opacity: 0.3; }
   50% { opacity: 1; }
+  100% { opacity: 0.3; }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Smooth transitions */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/* Mountain tree colors */
+.bg-alto-tree-day {
+  background-color: #4a4e69;
+}
+
+.bg-alto-tree-dawn {
+  background-color: #e3a975;
+}
+
+.bg-alto-tree-dusk {
+  background-color: #fb8b24;
+}
+
+.bg-alto-tree-night {
+  background-color: #2b304d;
 }
