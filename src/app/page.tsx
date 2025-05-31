@@ -36,24 +36,40 @@ function lerpColor(a: string, b: string, t: number) {
   return `#${rr.toString(16).padStart(2, '0')}${rg.toString(16).padStart(2, '0')}${rb.toString(16).padStart(2, '0')}`;
 }
 
+// Add seeded random number generator
+function mulberry32(a: number) {
+  return function() {
+    let t = a += 0x6D2B79F5;
+    t = Math.imul(t ^ t >>> 15, t | 1);
+    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  }
+}
+
 // Component to render the star field only on the client
 const StarField = ({ isNight, scrollY }: { isNight: boolean, scrollY: number }) => {
   const [stars, setStars] = useState<Array<{ id: number, style: CSSProperties }>>([]);
 
   // Effect to generate stars only on the client after mount
   useEffect(() => {
-    const generatedStars = Array.from({ length: 350 }).map((_, i) => {
-      const size = Math.random() * 1.5 + 0.5;
+    const random = mulberry32(5); // Use seed 42 for stars
+    const generatedStars = Array.from({ length: 500 }).map((_, i) => {
+      // Create more stars near the top using exponential distribution
+      const top = Math.pow(random(), 2) * 100; // This creates more stars near 0%
+      const size = random() * 1.2 + 0.3; // Smaller stars: 0.3-1.5px
+      const opacity = random() * 0.5 + 0.3; // Opacity between 0.3-0.8
+      const twinkleDuration = random() * 3 + 2; // Twinkle duration between 2-5s
+      
       return {
         id: i,
         style: {
           width: `${size}px`,
           height: `${size}px`,
-          top: `${Math.pow(Math.random(), 1.5) * 100}%`, // more stars near horizon
-          left: `${Math.random() * 100}%`,
-          opacity: Math.random() * 0.7 + 0.3,
-          animation: `twinkle ${Math.random() * 5 + 5}s ease-in-out infinite alternate`,
-          filter: 'blur(0.5px)',
+          top: `${top}%`,
+          left: `${random() * 100}%`,
+          opacity,
+          animation: `twinkle ${twinkleDuration}s ease-in-out infinite alternate`,
+          filter: 'blur(0.2px)',
         }
       };
     });
@@ -62,11 +78,11 @@ const StarField = ({ isNight, scrollY }: { isNight: boolean, scrollY: number }) 
 
   // Render stars only if it's night and the stars array is populated
   if (!isNight || stars.length === 0) {
-    return null; // Don't render stars if not night or not yet generated
+    return null;
   }
 
   return (
-    <div className="absolute inset-0 z-[-2] pointer-events-none" style={{ opacity: 1 - (scrollY * 0.001) }}>
+    <div className="fixed inset-0 z-[-1] pointer-events-none" style={{ opacity: 1 - (scrollY * 0.001) }}>
       {stars.map((star) => (
         <div
           key={star.id}
@@ -78,29 +94,33 @@ const StarField = ({ isNight, scrollY }: { isNight: boolean, scrollY: number }) 
   );
 };
 
-// Component to render geometric trees on a mountain layer
-const MountainTrees = ({ colorClass, density, mountainHeight, scrollFactor }: { colorClass: string, density: number, mountainHeight: string, scrollFactor: number }) => {
+// Component to render geometric trees on mountains
+const MountainTrees = ({ colorClass, mountainHeight, scrollFactor }: { colorClass: string, mountainHeight: string, scrollFactor: number }) => {
   const [trees, setTrees] = useState<Array<{ id: number, style: CSSProperties }>>([]);
   const [scrollY, setScrollY] = useState(0);
 
   // Effect to generate trees only on the client after mount
   useEffect(() => {
-    const generatedTrees = Array.from({ length: density }).map((_, i) => ({
-      id: i,
-      style: {
-        position: 'absolute' as CSSProperties['position'],
-        // Random horizontal position across the mountain width
-        left: `${Math.random() * 100}%`,
-        // Random vertical position near the top of the mountain layer, adjusted for perceived perspective
-        bottom: `${Math.random() * (parseInt(mountainHeight, 10) * 0.3) + (parseInt(mountainHeight, 10) * 0.6)}%`,
-        width: `${Math.random() * 8 + 4}px`, // Random width
-        height: `${Math.random() * 8 + 4}px`, // Random height
-        // Use clip-path to create a triangle shape
-        clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)',
-        // The background color will be applied via the Tailwind class
-        // transform: 'translateX(-50%)', // Center the triangle horizontally
-      }
-    }));
+    const random = mulberry32(5); // Use seed 123 for trees
+    const generatedTrees = Array.from({ length: 12 }).map((_, i) => {
+      const height = random() * 30 + 40; // Height between 40-70px
+      const width = height * 0.5; // Width is 50% of height
+      const left = random() * 85 + 7.5; // Position between 7.5-92.5% of width
+      const bottom = random() * 25 + 5; // Position between 5-30% from bottom
+      
+      return {
+        id: i,
+        style: {
+          position: 'absolute' as CSSProperties['position'],
+          left: `${left}%`,
+          bottom: `${bottom}%`,
+          width: `${width}px`,
+          height: `${height}px`,
+          clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)',
+          transition: 'background-color 1s ease-in-out',
+        }
+      };
+    });
     setTrees(generatedTrees);
 
     // Add scroll listener for parallax effect
@@ -110,7 +130,7 @@ const MountainTrees = ({ colorClass, density, mountainHeight, scrollFactor }: { 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
 
-  }, [density, mountainHeight]); // Regenerate trees if density or mountain height changes
+  }, [mountainHeight]);
 
   return (
     <div className="absolute inset-0 z-10">
@@ -136,11 +156,6 @@ export default function Home() {
   const [farMountainColor, setFarMountainColor] = useState('#9095b3'); // Default to Alto's day color
   const [middleMountainColor, setMiddleMountainColor] = useState('#7a7f9e'); // Default to Alto's day color
   const [closeMountainColor, setCloseMountainColor] = useState('#6a6b85'); // Default to Alto's day color
-
-  const [farTreeColor, setFarTreeColor] = useState('bg-alto-tree-day');
-  const [middleTreeColor, setMiddleTreeColor] = useState('bg-alto-tree-day');
-  const [closeTreeColor, setCloseTreeColor] = useState('bg-alto-tree-day');
-
   const [skyColor, setSkyColor] = useState('#87ceeb');
   const [arcCenterY, setArcCenterY] = useState(400); // Default value
 
@@ -174,16 +189,23 @@ export default function Home() {
     let animationFrame: number;
     function updateCelestial() {
       const now = performance.now();
-      const fastMinutes = ((now / 1000) % 120) / 120 * 1440;
+      // Get current time in milliseconds and modulo by 2 minutes (120000ms)
+      const currentTimeMs = Date.now() % 120000;
+      // Add the current time offset to the animation
+      const fastMinutes = ((now / 1000 + currentTimeMs / 1000) % 120) / 120 * 1440;
       const dayProgress = fastMinutes / 1440;
       const sunAngle = dayProgress * 2 * Math.PI - Math.PI / 2;
       const moonAngle = sunAngle + Math.PI;
       const arcRadius = arcCenterY * 0.7;
       
+      const newSunTop = `${arcCenterY - arcRadius * Math.sin(sunAngle)}px`;
+      const newSunLeft = `${50 + 35 * Math.cos(sunAngle)}%`;
+      const isSunVisible = arcCenterY - arcRadius * Math.sin(sunAngle) < arcCenterY;
+      
       setSunPosition({
-        top: `${arcCenterY - arcRadius * Math.sin(sunAngle)}px`,
-        left: `${50 + 35 * Math.cos(sunAngle)}%`,
-        visible: arcCenterY - arcRadius * Math.sin(sunAngle) < arcCenterY
+        top: newSunTop,
+        left: newSunLeft,
+        visible: isSunVisible
       });
       
       setMoonPosition({
@@ -195,21 +217,43 @@ export default function Home() {
       // Night detection
       const hour = Math.floor(fastMinutes / 60);
       setIsNight(hour < 6 || hour >= 20);
-      // Mountain and tree colors (unchanged)
-      let farMountainHex = '#9095b3', middleMountainHex = '#7a7f9e', closeMountainHex = '#6a6b85';
-      if (hour >= 0 && hour < 6) { farMountainHex = '#2b304d'; middleMountainHex = '#4a4e69'; closeMountainHex = '#5a5d77'; }
-      else if (hour >= 6 && hour < 8) { farMountainHex = '#e3a975'; middleMountainHex = '#eacb8a'; closeMountainHex = '#f5d6a1'; }
-      else if (hour >= 17 && hour < 20) { farMountainHex = '#fb8b24'; middleMountainHex = '#ffb703'; closeMountainHex = '#f5d6a1'; }
-      else if (hour >= 20) { farMountainHex = '#2b304d'; middleMountainHex = '#4a4e69'; closeMountainHex = '#5a5d77'; }
-      setFarMountainColor(farMountainHex);
-      setMiddleMountainColor(middleMountainHex);
-      setCloseMountainColor(closeMountainHex);
-      let treeColor = 'bg-alto-tree-day';
-      if (hour >= 0 && hour < 6) treeColor = 'bg-alto-tree-night';
-      else if (hour >= 6 && hour < 8) treeColor = 'bg-alto-tree-dawn';
-      else if (hour >= 17 && hour < 20) treeColor = 'bg-alto-tree-dusk';
-      else if (hour >= 20) treeColor = 'bg-alto-tree-night';
-      setFarTreeColor(treeColor); setMiddleTreeColor(treeColor); setCloseTreeColor(treeColor);
+      
+      // Mountain and tree colors based on sun position
+      const sunY = parseFloat(newSunTop);
+      const sunRadius = 48;
+      const horizonY = arcCenterY;
+      let sunOpacity = 1;
+      if (sunY + sunRadius > horizonY) {
+        sunOpacity = 0;
+      } else if (sunY + sunRadius > horizonY - sunRadius * 2) {
+        sunOpacity = 1 - ((sunY + sunRadius - (horizonY - sunRadius * 2)) / (sunRadius * 2));
+      }
+
+      // Mountain colors
+      const farDay = '#9095b3', farDusk = '#eacb8a', farNight = '#2b304d';
+      const midDay = '#7a7f9e', midDusk = '#e3a975', midNight = '#4a4e69';
+      const closeDay = '#6a6b85', closeDusk = '#f5d6a1', closeNight = '#5a5d77';
+      
+      let far, mid, close;
+      
+      if (sunOpacity > 0.7) {
+        far = lerpColor(farDay, farDusk, (1 - sunOpacity) / 0.3);
+        mid = lerpColor(midDay, midDusk, (1 - sunOpacity) / 0.3);
+        close = lerpColor(closeDay, closeDusk, (1 - sunOpacity) / 0.3);
+      } else if (sunOpacity > 0.2) {
+        far = lerpColor(farDusk, farNight, (0.7 - sunOpacity) / 0.5);
+        mid = lerpColor(midDusk, midNight, (0.7 - sunOpacity) / 0.5);
+        close = lerpColor(closeDusk, closeNight, (0.7 - sunOpacity) / 0.5);
+      } else {
+        far = farNight;
+        mid = midNight;
+        close = closeNight;
+      }
+      
+      setFarMountainColor(far);
+      setMiddleMountainColor(mid);
+      setCloseMountainColor(close);
+      
       animationFrame = requestAnimationFrame(updateCelestial);
     }
     animationFrame = requestAnimationFrame(updateCelestial);
@@ -239,27 +283,6 @@ export default function Home() {
       bg = night;
     }
     setSkyColor(bg);
-    // Mountain color stops
-    const farDay = '#9095b3', farDusk = '#eacb8a', farNight = '#2b304d';
-    const midDay = '#7a7f9e', midDusk = '#e3a975', midNight = '#4a4e69';
-    const closeDay = '#6a6b85', closeDusk = '#f5d6a1', closeNight = '#5a5d77';
-    let far, mid, close;
-    if (sunOpacity > 0.7) {
-      far = lerpColor(farDay, farDusk, (1 - sunOpacity) / 0.3);
-      mid = lerpColor(midDay, midDusk, (1 - sunOpacity) / 0.3);
-      close = lerpColor(closeDay, closeDusk, (1 - sunOpacity) / 0.3);
-    } else if (sunOpacity > 0.2) {
-      far = lerpColor(farDusk, farNight, (0.7 - sunOpacity) / 0.5);
-      mid = lerpColor(midDusk, midNight, (0.7 - sunOpacity) / 0.5);
-      close = lerpColor(closeDusk, closeNight, (0.7 - sunOpacity) / 0.5);
-    } else {
-      far = farNight;
-      mid = midNight;
-      close = closeNight;
-    }
-    setFarMountainColor(far);
-    setMiddleMountainColor(mid);
-    setCloseMountainColor(close);
   }, [sunPosition, arcCenterY]);
 
   return (
@@ -267,7 +290,7 @@ export default function Home() {
       {/* Sky Background - color based on sun fade */}
       <div
         className="fixed inset-0 transition-colors duration-1000"
-        style={{ zIndex: -1, backgroundColor: skyColor }}
+        style={{ zIndex: -2, backgroundColor: skyColor }}
       />
 
       {/* Star Field - Rendered as a separate component */}
@@ -357,13 +380,13 @@ export default function Home() {
             left: 0,
             width: '100%',
             height: '60vh',
-            clipPath: "polygon(0% 100%, 100% 100%, 100% 30%, 85% 20%, 70% 25%, 50% 15%, 30% 25%, 15% 20%, 0% 15%)",
-            backgroundColor: farMountainColor, // Use inline style with hex color
+            clipPath: "polygon(0% 100%, 100% 100%, 100% 30%, 85% 25%, 70% 28%, 50% 20%, 30% 28%, 15% 25%, 0% 30%)",
+            backgroundColor: farMountainColor,
             transform: `translateY(${scrollY * 0.1}px)`,
           }}
         >
           {/* Trees for Far Mountains */}
-          <MountainTrees colorClass={farTreeColor} density={30} mountainHeight="60vh" scrollFactor={0.1} />
+          <MountainTrees colorClass="bg-alto-tree-day" mountainHeight="60vh" scrollFactor={0.1} />
         </div>
         {/* Middle Mountains */}
         <div
@@ -374,13 +397,13 @@ export default function Home() {
             left: 0,
             width: '100%',
             height: '50vh',
-            clipPath: "polygon(0% 100%, 100% 100%, 100% 45%, 80% 35%, 60% 40%, 40% 30%, 20% 40%, 0% 35%)",
-            backgroundColor: middleMountainColor, // Use inline style with hex color
+            clipPath: "polygon(0% 100%, 100% 100%, 100% 45%, 80% 40%, 60% 43%, 40% 35%, 20% 43%, 0% 40%)",
+            backgroundColor: middleMountainColor,
             transform: `translateY(${scrollY * 0.2}px)`
           }}
         >
           {/* Trees for Middle Mountains */}
-          <MountainTrees colorClass={middleTreeColor} density={40} mountainHeight="50vh" scrollFactor={0.2} />
+          <MountainTrees colorClass="bg-alto-tree-day" mountainHeight="50vh" scrollFactor={0.2} />
         </div>
         {/* Close Mountains */}
         <div
@@ -391,14 +414,14 @@ export default function Home() {
             left: 0,
             width: '100%',
             height: '40vh',
-            clipPath: "polygon(0% 100%, 100% 100%, 100% 55%, 90% 45%, 75% 50%, 60% 40%, 45% 50%, 30% 45%, 15% 50%, 0% 40%)",
-            backgroundColor: closeMountainColor, // Use inline style with hex color
+            clipPath: "polygon(0% 100%, 100% 100%, 100% 55%, 90% 50%, 75% 53%, 60% 45%, 45% 53%, 30% 50%, 15% 53%, 0% 50%)",
+            backgroundColor: closeMountainColor,
             transform: `translateY(${scrollY * 0.3}px)`,
             zIndex: 10,
           }}
         >
           {/* Trees for Close Mountains */}
-          <MountainTrees colorClass={closeTreeColor} density={50} mountainHeight="40vh" scrollFactor={0.3} />
+          <MountainTrees colorClass="bg-alto-tree-day" mountainHeight="40vh" scrollFactor={0.3} />
         </div>
       </div>
 
