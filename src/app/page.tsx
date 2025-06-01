@@ -286,7 +286,7 @@ export default function Home() {
   }, [sunPosition, arcCenterY]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <div className="relative min-h-[200vh] overflow-x-hidden">
       {/* Sky Background - color based on sun fade */}
       <div
         className="fixed inset-0 transition-colors duration-1000"
@@ -297,12 +297,12 @@ export default function Home() {
       <StarField isNight={isNight} scrollY={scrollY} />
 
       {/* Sun/Moon - Rendered behind close mountain */}
-      <div style={{ position: 'absolute', width: '100%', height: '100%', zIndex: 5, pointerEvents: 'none' }}>
+      <div style={{ position: 'fixed', width: '100%', height: '100%', zIndex: 5, pointerEvents: 'none' }}>
         {/* Sun */}
         {(() => {
           const sunY = parseFloat(sunPosition.top);
-          const sunRadius = 48; // px (half of w-24)
-          const horizonY = arcCenterY; // middle of the page
+          const sunRadius = 48;
+          const horizonY = arcCenterY;
           let sunOpacity = 1;
           if (sunY + sunRadius > horizonY) {
             sunOpacity = 0;
@@ -315,8 +315,8 @@ export default function Home() {
               style={{
                 top: sunPosition.top,
                 left: sunPosition.left,
-                transform: `translate(-50%, ${scrollY * 0.2}px)`,
-                opacity: sunOpacity * (1 - (scrollY * 0.003)),
+                transform: 'translate(-50%, -50%)',
+                opacity: sunOpacity,
               }}
             />
           );
@@ -324,7 +324,7 @@ export default function Home() {
         {/* Moon (thinner crescent) */}
         {(() => {
           const moonY = parseFloat(moonPosition.top);
-          const moonRadius = 28; // px (half of 56px)
+          const moonRadius = 28;
           const horizonY = arcCenterY;
           let moonOpacity = 1;
           if (moonY + moonRadius > horizonY) {
@@ -350,7 +350,6 @@ export default function Home() {
               }}
               aria-label="Moon"
             >
-              {/* Thinner crescent mask */}
               <div
                 style={{
                   position: 'absolute',
@@ -369,8 +368,8 @@ export default function Home() {
         })()}
       </div>
 
-      {/* Mountain Background - Using Tailwind classes for colors */}
-      <div className="absolute bottom-0 left-0 w-full h-[70vh] z-0">
+      {/* Mountain Background */}
+      <div className="fixed bottom-0 left-0 w-full h-[70vh] z-0">
         {/* Far Mountains */}
         <div
           className={`absolute bottom-0 w-full h-[60vh] transition-colors duration-1000`}
@@ -385,7 +384,6 @@ export default function Home() {
             transform: `translateY(${scrollY * 0.1}px)`,
           }}
         >
-          {/* Trees for Far Mountains */}
           <MountainTrees colorClass="bg-alto-tree-day" mountainHeight="60vh" scrollFactor={0.1} />
         </div>
         {/* Middle Mountains */}
@@ -402,7 +400,6 @@ export default function Home() {
             transform: `translateY(${scrollY * 0.2}px)`
           }}
         >
-          {/* Trees for Middle Mountains */}
           <MountainTrees colorClass="bg-alto-tree-day" mountainHeight="50vh" scrollFactor={0.2} />
         </div>
         {/* Close Mountains */}
@@ -420,13 +417,12 @@ export default function Home() {
             zIndex: 10,
           }}
         >
-          {/* Trees for Close Mountains */}
           <MountainTrees colorClass="bg-alto-tree-day" mountainHeight="40vh" scrollFactor={0.3} />
         </div>
       </div>
 
       {/* Content */}
-      <div className="absolute top-0 left-0 right-0 z-20 pt-32 px-4 md:px-8">
+      <div className="relative z-20 pt-32 px-4 md:px-8">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <h1
@@ -448,35 +444,133 @@ export default function Home() {
               Welcome to my corner of the internet. I&apos;m passionate about technology, philosophy, and continuous learning.
             </p>
           </div>
+        </div>
+      </div>
 
-          <div
-            className="grid grid-cols-1 md:grid-cols-3 gap-6"
-            style={{
-              transform: `translateY(${scrollY * 0.2}px)`,
-              opacity: 1 - (scrollY * 0.001)
-            }}
-          >
-            <Link
-              href="/projects"
-              className="p-6 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/20"
+      {/* Bouncing Arrow */}
+      <div 
+        className="fixed bottom-12 left-1/2 transform -translate-x-1/2 z-30"
+        style={{
+          opacity: Math.max(0, 1 - (scrollY * 0.005))
+        }}
+      >
+        <div className="w-12 h-12 rounded-full border-2 border-white/30 flex items-center justify-center">
+          <div className="animate-bounce">
+            <svg 
+              className="w-6 h-6 text-white" 
+              fill="none" 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth="2" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
             >
-              <h2 className="text-xl font-semibold mb-2 text-white">Projects</h2>
-              <p className="text-gray-200">Check out my latest work and experiments</p>
-            </Link>
-            <Link
-              href="/blog"
-              className="p-6 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/20"
-            >
-              <h2 className="text-xl font-semibold mb-2 text-white">Blog</h2>
-              <p className="text-gray-200">Philosophical thoughts and musings</p>
-            </Link>
-            <Link
-              href="/notes"
-              className="p-6 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/20"
-            >
-              <h2 className="text-xl font-semibold mb-2 text-white">Notes</h2>
-              <p className="text-gray-200">Technical notes and course reflections</p>
-            </Link>
+              <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Sections */}
+      <div className="relative z-20 mt-[100vh]">
+        {/* Navigation Cards */}
+        <div className="px-4 md:px-8 mb-32">
+          <div className="max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Link
+                href="/projects"
+                className="p-6 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/20"
+              >
+                <h2 className="text-xl font-semibold mb-2 text-white">Projects</h2>
+                <p className="text-gray-200">Check out my latest work and experiments</p>
+              </Link>
+              <Link
+                href="/blog"
+                className="p-6 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/20"
+              >
+                <h2 className="text-xl font-semibold mb-2 text-white">Blog</h2>
+                <p className="text-gray-200">Philosophical thoughts and musings</p>
+              </Link>
+              <Link
+                href="/notes"
+                className="p-6 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/20"
+              >
+                <h2 className="text-xl font-semibold mb-2 text-white">Notes</h2>
+                <p className="text-gray-200">Technical notes and course reflections</p>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* About Me Section */}
+        <div className="px-4 md:px-8 mb-32">
+          <div className="max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+              <div>
+                <h2 className="text-4xl font-bold mb-6 text-white">About Me</h2>
+                <p className="text-lg text-gray-200 mb-4">
+                  I&apos;m a passionate developer and lifelong learner with a keen interest in technology and philosophy. 
+                  My journey in tech has led me through various domains, from web development to artificial intelligence.
+                </p>
+                <p className="text-lg text-gray-200 mb-4">
+                  When I&apos;m not coding, you can find me exploring philosophical concepts, reading about emerging technologies, 
+                  or experimenting with new ideas. I believe in the power of continuous learning and sharing knowledge with others.
+                </p>
+                <p className="text-lg text-gray-200">
+                  My goal is to create meaningful solutions that make a positive impact while pushing the boundaries of what&apos;s possible.
+                </p>
+              </div>
+              <div className="relative">
+                <div className="aspect-square rounded-lg overflow-hidden bg-white/10 backdrop-blur-sm border border-white/20">
+                  <div className="w-full h-full flex items-center justify-center text-gray-400">
+                    [Your Photo Here]
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Contact Section */}
+        <div className="px-4 md:px-8 mb-32">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-4xl font-bold mb-12 text-white text-center">Get in Touch</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <a
+                href="mailto:your.email@example.com"
+                className="p-6 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/20 text-center"
+              >
+                <svg className="w-8 h-8 mx-auto mb-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <h3 className="text-xl font-semibold mb-2 text-white">Email</h3>
+                <p className="text-gray-200">your.email@example.com</p>
+              </a>
+              <a
+                href="https://github.com/yourusername"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-6 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/20 text-center"
+              >
+                <svg className="w-8 h-8 mx-auto mb-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+                <h3 className="text-xl font-semibold mb-2 text-white">GitHub</h3>
+                <p className="text-gray-200">@yourusername</p>
+              </a>
+              <a
+                href="https://linkedin.com/in/yourusername"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-6 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/20 text-center"
+              >
+                <svg className="w-8 h-8 mx-auto mb-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                </svg>
+                <h3 className="text-xl font-semibold mb-2 text-white">LinkedIn</h3>
+                <p className="text-gray-200">in/yourusername</p>
+              </a>
+            </div>
           </div>
         </div>
       </div>
