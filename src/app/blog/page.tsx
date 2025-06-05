@@ -8,8 +8,7 @@ export default function Blog() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Replace 'your-password' with your actual password
-    if (password === 'your-password') {
+    if (password === process.env.NEXT_PUBLIC_BLOG_PASSWORD) {
       setIsAuthenticated(true);
     } else {
       alert('Incorrect password');

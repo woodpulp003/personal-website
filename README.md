@@ -1,4 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# My Personal Website
+
+Code for my personal website! Not hosted yet, but you can run it locally.
+
+## Local Development
+
+1. Clone the repo
+```bash
+git clone https://github.com/yourusername/personal-website.git
+cd personal-website
+```
+
+2. Install dependencies
+```bash
+npm install
+```
+
+3. Run the development server
+```bash
+npm run dev
+```
+
+4. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+## Tech Stack
+- Next.js
+- TypeScript
+- Tailwind CSS
+- Framer Motion
 
 ## TODO Stuff
 1) Change Notes to Coursework and Notes. Have it organized by semester and by subject/area. Add disclaimers for it that it's not notes but high-level summary.
