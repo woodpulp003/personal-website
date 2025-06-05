@@ -51,6 +51,14 @@ const projects: Project[] = [
     linkText: 'Code Upload in Progress'
   },
   {
+    title: 'LSTMs Represent Belief State Geometry',
+    description: 'Research project replicating findings from [Transformers Represent Belief State Geometry](https://arxiv.org/pdf/2405.15943). \n\n Investigated how LSTM networks represent belief states in their hidden activations when trained on next-token prediction tasks. Demonstrated that belief states are linearly represented in the LSTM hidden states, even in cases where the predicted belief state geometry has highly nontrivial fractal structure. Extended the original work to show that this phenomenon is not unique to transformers but also occurs in other sequence models.',
+    tags: ['Deep Learning', 'Research', 'Neural Networks'],
+    image: '/images/vinyl-placeholder-1.png',
+    link: 'https://github.com/yourusername/lstm-belief-states',
+    linkText: 'Code Upload in Progress',
+  },
+  {
     title: 'CricketBOT: Robot that plays cricket',
     description: 'Final project for [Robotic Manipulation (6.4210)](https://manipulation.csail.mit.edu/Fall2024/). \n\n Built a robot simulation in Drake that can react to random ball throws and come up with shots on its own. Implemented ball tracking, trajectory prediction, motion planning and smooth execution for a Kuka-IIWA robot. Worked with M. Gadhiwala and M. Hegde.',
     tags: ['Robotics', 'Computer Vision', 'Hardware'],

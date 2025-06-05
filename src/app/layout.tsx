@@ -14,13 +14,17 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body>
+      <body className="bg-black">
         <AnimatePresence mode="wait">
           <motion.div
             key={pathname}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            exit={{ opacity: 0 }}
+            transition={{ 
+              duration: 0.3,
+              ease: "easeInOut"
+            }}
           >
             <Navigation />
             <main className="min-h-screen">
