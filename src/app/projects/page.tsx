@@ -2,57 +2,87 @@
 
 import { useState, useEffect } from 'react';
 
-const projects = [
+interface Project {
+  title: string;
+  description: string;
+  tags: string[];
+  image: string;
+  link: string;
+  status: string;
+}
+
+const projects: Project[] = [
   {
-    title: "Personal Website",
-    description: "A modern, responsive personal website built with Next.js and Tailwind CSS, featuring a dynamic day/night cycle and parallax scrolling effects.",
-    tags: ["Next.js", "Tailwind CSS", "TypeScript"],
-    image: "/images/vinyl-placeholder-1.png",
-    link: "https://github.com/woodpulp003/personal-website"
+    title: 'Invariant Representation Learning from Equivariant Embeddings',
+    description: 'Research project exploring how to extract invariant representations from equivariant neural network embeddings. Investigating the relationship between symmetry and representation learning.',
+    tags: ['Machine Learning', 'Research', 'Computer Vision'],
+    image: '/images/vinyl-placeholder-1.png',
+    link: 'https://github.com/yourusername/invariant-learning',
+    status: 'Work in Progress'
   },
   {
-    title: "AI-Powered Code Review",
-    description: "An AI system that analyzes code changes and provides detailed feedback on potential issues, code quality, and best practices.",
-    tags: ["Python", "OpenAI", "GitHub API"],
-    image: "/images/vinyl-placeholder-2.png",
-    link: "https://github.com/woodpulp003/ai-code-review"
+    title: 'Robust Regression Methods',
+    description: 'Implementation and analysis of various robust regression techniques for handling outliers and noisy data in statistical modeling.',
+    tags: ['Statistics', 'Machine Learning', 'Data Analysis'],
+    image: '/images/vinyl-placeholder-2.png',
+    link: 'https://github.com/yourusername/robust-regression',
+    status: 'Work in Progress'
   },
   {
-    title: "Smart Home Dashboard",
-    description: "A centralized dashboard for managing smart home devices, with real-time monitoring and automated control systems.",
-    tags: ["React", "Node.js", "IoT"],
-    image: "/images/vinyl-placeholder-3.png",
-    link: "https://github.com/woodpulp003/smart-home-dashboard"
+    title: 'Class Selectivity in Deeper Layers of Self Supervised ResNet',
+    description: 'Investigating how class selectivity emerges in deeper layers of self-supervised ResNet models and its implications for transfer learning.',
+    tags: ['Deep Learning', 'Computer Vision', 'Research'],
+    image: '/images/vinyl-placeholder-3.png',
+    link: 'https://github.com/yourusername/class-selectivity',
+    status: 'Work in Progress'
   },
   {
-    title: "Language Learning App",
-    description: "An interactive language learning platform with personalized learning paths and real-time progress tracking.",
-    tags: ["Flutter", "Firebase", "Dart"],
-    image: "/images/vinyl-placeholder-1.png",
-    link: "https://github.com/woodpulp003/language-learning-app"
+    title: 'GraphRAG',
+    description: 'A novel approach to Retrieval Augmented Generation using graph-based knowledge representation for improved context retrieval and response generation.',
+    tags: ['NLP', 'Graph Theory', 'LLMs'],
+    image: '/images/vinyl-placeholder-1.png',
+    link: 'https://github.com/yourusername/graphrag',
+    status: 'Work in Progress'
   },
   {
-    title: "E-commerce Analytics",
-    description: "A comprehensive analytics platform for e-commerce businesses, providing insights into customer behavior and sales trends.",
-    tags: ["Python", "Django", "PostgreSQL"],
-    image: "/images/vinyl-placeholder-2.png",
-    link: "https://github.com/woodpulp003/ecommerce-analytics"
+    title: 'Real-time Beatbox Classifier using 1D CNNs',
+    description: 'An interactive system that uses 1D Convolutional Neural Networks to classify beatbox sounds in real-time, enabling live performance analysis.',
+    tags: ['Audio Processing', 'Deep Learning', 'Real-time Systems'],
+    image: '/images/vinyl-placeholder-2.png',
+    link: 'https://github.com/yourusername/beatbox-classifier',
+    status: 'Work in Progress'
   },
   {
-    title: "Task Management System",
-    description: "A collaborative task management system with real-time updates, team collaboration features, and progress tracking.",
-    tags: ["Vue.js", "Express", "MongoDB"],
-    image: "/images/vinyl-placeholder-3.png",
-    link: "https://github.com/woodpulp003/task-management"
+    title: 'ByteMe: Learn Audio Synthesis Interactively',
+    description: 'An interactive web application for learning audio synthesis concepts through hands-on experimentation and visualization.',
+    tags: ['Web Development', 'Audio', 'Education'],
+    image: '/images/vinyl-placeholder-3.png',
+    link: 'https://github.com/yourusername/bytime',
+    status: 'Work in Progress'
+  },
+  {
+    title: 'Time Series Analysis for CPI Prediction',
+    description: 'Development of time series models to predict Consumer Price Index trends using historical data and economic indicators.',
+    tags: ['Time Series', 'Economics', 'Data Science'],
+    image: '/images/vinyl-placeholder-1.png',
+    link: 'https://github.com/yourusername/cpi-prediction',
+    status: 'Work in Progress'
+  },
+  {
+    title: 'Modeling Primordial Blackholes in quasi-Abelian plasma',
+    description: 'Theoretical physics project investigating the formation and evolution of primordial black holes in quasi-Abelian plasma environments.',
+    tags: ['Physics', 'Research', 'Simulation'],
+    image: '/images/vinyl-placeholder-2.png',
+    link: 'https://github.com/yourusername/primordial-blackholes',
+    status: 'Work in Progress'
   }
 ];
 
 export default function Projects() {
   const [selected, setSelected] = useState(0);
-  const [hovered, setHovered] = useState<number>(-1);
+  const [hovered, setHovered] = useState(-1);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Check if we're on mobile
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 1024);
@@ -150,6 +180,9 @@ export default function Projects() {
                   </span>
                 ))}
               </div>
+              <span className="inline-block px-2 py-1 bg-yellow-900/30 text-yellow-400 rounded-full text-xs">
+                {projects[selected].status}
+              </span>
             </div>
           </div>
           <div className="flex-1 overflow-y-auto text-neutral-200 text-base leading-relaxed px-8 py-6">
@@ -161,7 +194,7 @@ export default function Projects() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            View Project
+            View on GitHub
           </a>
         </div>
       )}
@@ -195,6 +228,9 @@ export default function Projects() {
                     </span>
                   ))}
                 </div>
+                <span className="inline-block px-2 py-1 bg-yellow-900/30 text-yellow-400 rounded-full text-xs">
+                  {projects[selected].status}
+                </span>
               </div>
             </div>
             <div className="flex-1 overflow-y-auto text-neutral-200 text-base leading-relaxed px-8 py-6">
@@ -206,7 +242,7 @@ export default function Projects() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              View Project
+              View on GitHub
             </a>
           </div>
         </div>
