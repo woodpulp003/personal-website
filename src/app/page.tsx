@@ -158,6 +158,7 @@ export default function Home() {
   const [closeMountainColor, setCloseMountainColor] = useState('#6a6b85'); // Default to Alto's day color
   const [skyColor, setSkyColor] = useState('#87ceeb');
   const [arcCenterY, setArcCenterY] = useState(400); // Default value
+  const [showCopied, setShowCopied] = useState(false);
 
   // Add useEffect to handle window dimensions
   useEffect(() => {
@@ -284,6 +285,16 @@ export default function Home() {
     }
     setSkyColor(bg);
   }, [sunPosition, arcCenterY]);
+
+  const handleCopyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText('sahil003akhtar@gmail.com');
+      setShowCopied(true);
+      setTimeout(() => setShowCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy email:', err);
+    }
+  };
 
   return (
     <div className="relative min-h-[200vh] overflow-x-hidden">
@@ -432,7 +443,7 @@ export default function Home() {
                 opacity: 1 - (scrollY * 0.002)
               }}
             >
-              Sahil
+              Sahil Akhtar
             </h1>
             <p
               className="text-xl md:text-2xl text-gray-200 mb-12 drop-shadow-sm"
@@ -441,7 +452,10 @@ export default function Home() {
                 opacity: 1 - (scrollY * 0.002)
               }}
             >
-              Welcome to my corner of the internet. I&apos;m passionate about technology, philosophy, and continuous learning.
+              Drowning, wishing it was headfirst.
+            </p>
+            <p>
+              Scroll down.
             </p>
           </div>
         </div>
@@ -481,7 +495,7 @@ export default function Home() {
                 href="/projects"
                 className="p-6 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/20"
               >
-                <h2 className="text-xl font-semibold mb-2 text-white">Projects</h2>
+                <h2 className="text-xl font-semibold mb-2 text-white">Projects [WIP]</h2>
                 <p className="text-gray-200">Check out my latest work and experiments</p>
               </Link>
               <Link
@@ -495,7 +509,7 @@ export default function Home() {
                 href="/notes"
                 className="p-6 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/20"
               >
-                <h2 className="text-xl font-semibold mb-2 text-white">Notes</h2>
+                <h2 className="text-xl font-semibold mb-2 text-white">Notes [WIP]</h2>
                 <p className="text-gray-200">Technical notes and course reflections</p>
               </Link>
             </div>
@@ -509,22 +523,37 @@ export default function Home() {
               <div>
                 <h2 className="text-4xl font-bold mb-6 text-white">About Me</h2>
                 <p className="text-lg text-gray-200 mb-4">
-                  I&apos;m a passionate developer and lifelong learner with a keen interest in technology and philosophy. 
-                  My journey in tech has led me through various domains, from web development to artificial intelligence.
+                  {/* I&apos;m a passionate developer and lifelong learner with a keen interest in technology and philosophy. 
+                  My journey in tech has led me through various domains, from web development to artificial intelligence. */}
+                  I&apos;m a sophomore at MIT majoring in Physics and Computer Science from Kolkata, India. I am passionate about Machine Learning, Music, Philosophy and Teaching. 
                 </p>
                 <p className="text-lg text-gray-200 mb-4">
-                  When I&apos;m not coding, you can find me exploring philosophical concepts, reading about emerging technologies, 
-                  or experimenting with new ideas. I believe in the power of continuous learning and sharing knowledge with others.
+                  {/* When I&apos;m not coding, you can find me exploring philosophical concepts, reading about emerging technologies, 
+                  or experimenting with new ideas. I believe in the power of continuous learning and sharing knowledge with others. */}
+                  In my free time, I can be found beatboxing, singing or chatting with friends about topics of questionable importance. 
                 </p>
                 <p className="text-lg text-gray-200">
-                  My goal is to create meaningful solutions that make a positive impact while pushing the boundaries of what&apos;s possible.
+                  {/* My goal is to create meaningful solutions that make a positive impact while pushing the boundaries of what&apos;s possible. */}
+                  I deeply care about the truth. If anything, I wish to find out what makes us intelligent and conscious.
+                </p>
+                <p className="text-lg text-gray-200 mt-4">
+                  <a 
+                    href="/sahil_resume.pdf" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-white hover:text-gray-300 underline underline-offset-4 transition-colors duration-200"
+                  >
+                    You can find a copy of my resume here.
+                  </a>
                 </p>
               </div>
               <div className="relative">
                 <div className="aspect-square rounded-lg overflow-hidden bg-white/10 backdrop-blur-sm border border-white/20">
-                  <div className="w-full h-full flex items-center justify-center text-gray-400">
-                    [Your Photo Here]
-                  </div>
+                  <img
+                    src="/images/sahil.jpg"
+                    alt="Sahil Akhtar"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               </div>
             </div>
@@ -536,18 +565,23 @@ export default function Home() {
           <div className="max-w-4xl mx-auto">
             <h2 className="text-4xl font-bold mb-12 text-white text-center">Get in Touch</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <a
-                href="mailto:your.email@example.com"
-                className="p-6 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/20 text-center"
+              <button
+                onClick={handleCopyEmail}
+                className="p-6 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/20 text-center relative"
               >
                 <svg className="w-8 h-8 mx-auto mb-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
                 <h3 className="text-xl font-semibold mb-2 text-white">Email</h3>
-                <p className="text-gray-200">your.email@example.com</p>
-              </a>
+                <p className="text-gray-200">sahil003akhtar@gmail.com</p>
+                {showCopied && (
+                  <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-3 py-1 rounded text-sm whitespace-nowrap">
+                    Copied to clipboard!
+                  </div>
+                )}
+              </button>
               <a
-                href="https://github.com/yourusername"
+                href="https://github.com/woodpulp003"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-6 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/20 text-center"
@@ -556,10 +590,10 @@ export default function Home() {
                   <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                 </svg>
                 <h3 className="text-xl font-semibold mb-2 text-white">GitHub</h3>
-                <p className="text-gray-200">@yourusername</p>
+                <p className="text-gray-200">@woodpulp003</p>
               </a>
               <a
-                href="https://linkedin.com/in/yourusername"
+                href="https://linkedin.com/in/sahil003"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-6 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/20 text-center"
@@ -568,7 +602,7 @@ export default function Home() {
                   <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
                 </svg>
                 <h3 className="text-xl font-semibold mb-2 text-white">LinkedIn</h3>
-                <p className="text-gray-200">in/yourusername</p>
+                <p className="text-gray-200">in/sahil003</p>
               </a>
             </div>
           </div>

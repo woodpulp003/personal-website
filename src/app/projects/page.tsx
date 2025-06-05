@@ -7,75 +7,81 @@ interface Project {
   description: string;
   tags: string[];
   image: string;
-  link: string;
-  status: string;
+  link?: string;
+  linkText?: string;
+  status?: string;
 }
 
 const projects: Project[] = [
   {
-    title: 'Invariant Representation Learning from Equivariant Embeddings',
-    description: 'Research project exploring how to extract invariant representations from equivariant neural network embeddings. Investigating the relationship between symmetry and representation learning.',
-    tags: ['Machine Learning', 'Research', 'Computer Vision'],
-    image: '/images/vinyl-placeholder-1.png',
-    link: 'https://github.com/yourusername/invariant-learning',
-    status: 'Work in Progress'
-  },
-  {
-    title: 'Robust Regression Methods',
-    description: 'Implementation and analysis of various robust regression techniques for handling outliers and noisy data in statistical modeling.',
-    tags: ['Statistics', 'Machine Learning', 'Data Analysis'],
-    image: '/images/vinyl-placeholder-2.png',
-    link: 'https://github.com/yourusername/robust-regression',
-    status: 'Work in Progress'
-  },
-  {
     title: 'Class Selectivity in Deeper Layers of Self Supervised ResNet',
-    description: 'Investigating how class selectivity emerges in deeper layers of self-supervised ResNet models and its implications for transfer learning.',
+    description: 'UROP project under PI [Prof. Nancy Kanwisher](https://mcgovern.mit.edu/profile/nancy-kanwisher/) and PhD student Bowen Zheng. \n\n Investigated the phenomenon of class selectivity in deeper layers of self-supervised deep learning models [(Konkle et al., 2024)](https://pubmed.ncbi.nlm.nih.gov/39321304/). Used ResNet-18 models trained with Momentum-Contrast (MoCo) on various training datasets to study the activation patterns of the model. Constructed t-maps to find selective units and their variation against model depth and training dataset perturbations.',
     tags: ['Deep Learning', 'Computer Vision', 'Research'],
     image: '/images/vinyl-placeholder-3.png',
     link: 'https://github.com/yourusername/class-selectivity',
-    status: 'Work in Progress'
+    linkText: 'Code Upload in Progress',
+  },
+  {
+    title: 'Robust Regression Methods',
+    description: 'Summer 2024 Internship Project as Quantitative Researcher at [Graviton Research Capital](https://www.gravitontrading.com/). \n\n Came up with custom regression methods for large financial datasets with many outliers. Combined alphas to generate final trade signal. Built interpretable, robust and efficient models that improved bucket KPIs by 10%, and were implemented in company\'s pipeline.',
+    tags: ['Statistics', 'Machine Learning', 'Data Analysis'],
+    image: '/images/vinyl-placeholder-2.png',
   },
   {
     title: 'GraphRAG',
-    description: 'A novel approach to Retrieval Augmented Generation using graph-based knowledge representation for improved context retrieval and response generation.',
+    description: 'Summer 2025 Internship as AI Engineer at [Sonatus](https://www.sonatus.com/). \n\n A novel approach to Retrieval Augmented Generation using graph-based knowledge representation. Improved context retrieval through graph database that can ingest data from multiple sources and be updated in real-time.',
     tags: ['NLP', 'Graph Theory', 'LLMs'],
     image: '/images/vinyl-placeholder-1.png',
-    link: 'https://github.com/yourusername/graphrag',
     status: 'Work in Progress'
+  },
+  {
+    title: 'Invariant Representation Learning from Equivariant Embeddings',
+    description: 'Final project for [Statistical Learning Theory (6.7910)](https://poggio-lab.mit.edu/9-520/). \n\n Based on [Neural Isometries (NIso)](https://arxiv.org/abs/2405.19296) architecture, we used the [Group-Invariant Signatures](https://arxiv.org/pdf/1311.4158) proposed by Poggio et al. to demonstrate that equivariant embeddings led to more powerful signatures (and are thus better for classification), and better invariance of the signature. We used the Homography-perturbed MNIST (HomNIST) dataset for our experiments. Worked with E. Kim, L. Cai.',
+    tags: ['Machine Learning', 'Research', 'Symmetry'],
+    image: '/images/vinyl-placeholder-1.png',
+    link: 'https://github.com/yourusername/invariant-learning',
+    linkText: 'Code Upload in Progress',
   },
   {
     title: 'Real-time Beatbox Classifier using 1D CNNs',
-    description: 'An interactive system that uses 1D Convolutional Neural Networks to classify beatbox sounds in real-time, enabling live performance analysis.',
+    description: 'HackMIT 2024 Project. \n\nAn interactive system that uses 1D Convolutional Neural Networks to classify beatbox sounds in real-time. Implemented a game to teach users how to beatbox, or simply play along and have fun! \n\n Reduced bit-precision of model and implemented a strategy to run inference on model only when necessary. Created own training dataset with noisy augmentations to induce robustness. Worked with D. Villanueva and A. Chen.',
     tags: ['Audio Processing', 'Deep Learning', 'Real-time Systems'],
     image: '/images/vinyl-placeholder-2.png',
     link: 'https://github.com/yourusername/beatbox-classifier',
-    status: 'Work in Progress'
+    linkText: 'Code Upload in Progress'
+  },
+  {
+    title: 'CricketBOT: Robot that plays cricket',
+    description: 'Final project for [Robotic Manipulation (6.4210)](https://manipulation.csail.mit.edu/Fall2024/). \n\n Built a robot simulation in Drake that can react to random ball throws and come up with shots on its own. Implemented ball tracking, trajectory prediction, motion planning and smooth execution for a Kuka-IIWA robot. Worked with M. Gadhiwala and M. Hegde.',
+    tags: ['Robotics', 'Computer Vision', 'Hardware'],
+    image: '/images/vinyl-placeholder-3.png',
+    link: 'https://github.com/yourusername/cricketbot',
+    linkText: 'Code Upload in Progress',
   },
   {
     title: 'ByteMe: Learn Audio Synthesis Interactively',
-    description: 'An interactive web application for learning audio synthesis concepts through hands-on experimentation and visualization.',
+    description: 'Weblab 2024 Project. \n\n An interactive web application for learning audio synthesis concepts, building your own sounds, and playing them on a piano using a computer keyboard. Users can change the ADSR profile, waveform and other parameters of the sound, and save their sound presets. Worked with M. Hegde and N. Kothnur.',
     tags: ['Web Development', 'Audio', 'Education'],
     image: '/images/vinyl-placeholder-3.png',
     link: 'https://github.com/yourusername/bytime',
-    status: 'Work in Progress'
+    linkText: 'Code Upload in Progress',
+  },
+  {
+    title: 'Primordial Black Holes',
+    description: 'UROP Project under PI Prof. David Kaiser. \n\n Research project to model Primordial Black Holes as a charged blackhole in a quasi-Abelian Plasma. Applied the Einstein Field Equation on the stress-energy tensor of the plasma to find the metric of the blackhole. Numerically solved the equations using Mathematica to obtain the horizon size of the blackhole as a function of universe temeperature.',
+    tags: ['Physics', 'Cosmology', 'Research'],
+    image: '/images/vinyl-placeholder-2.png',
+    link: 'https://github.com/yourusername/pbh-research',
+    linkText: 'Code Upload in Progress',
   },
   {
     title: 'Time Series Analysis for CPI Prediction',
-    description: 'Development of time series models to predict Consumer Price Index trends using historical data and economic indicators.',
+    description: 'Project for [Statistics, Computation and Applications (6.3730)](https://student.mit.edu/catalog/m6c.html). \n\n Used autoregressive models, partial autocorrelograms and external regressors to improve the prediction model for the CPI (a proxy for inflation rates).',
     tags: ['Time Series', 'Economics', 'Data Science'],
     image: '/images/vinyl-placeholder-1.png',
     link: 'https://github.com/yourusername/cpi-prediction',
-    status: 'Work in Progress'
+    linkText: 'Code Upload in Progress',
   },
-  {
-    title: 'Modeling Primordial Blackholes in quasi-Abelian plasma',
-    description: 'Theoretical physics project investigating the formation and evolution of primordial black holes in quasi-Abelian plasma environments.',
-    tags: ['Physics', 'Research', 'Simulation'],
-    image: '/images/vinyl-placeholder-2.png',
-    link: 'https://github.com/yourusername/primordial-blackholes',
-    status: 'Work in Progress'
-  }
 ];
 
 export default function Projects() {
@@ -145,7 +151,9 @@ export default function Projects() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="font-semibold text-base truncate group-hover:underline">{project.title}</div>
-                  <div className="text-neutral-400 text-xs truncate max-w-md">{project.description}</div>
+                  <div className="text-neutral-400 text-xs truncate max-w-md">
+                    {project.description.split('\n')[0].replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')}
+                  </div>
                 </div>
                 <div className="hidden md:flex w-32 justify-end gap-1 flex-wrap">
                   {project.tags.map((tag, i) => (
@@ -180,22 +188,49 @@ export default function Projects() {
                   </span>
                 ))}
               </div>
-              <span className="inline-block px-2 py-1 bg-yellow-900/30 text-yellow-400 rounded-full text-xs">
-                {projects[selected].status}
-              </span>
+              {projects[selected].status && (
+                <span className="inline-block px-2 py-1 bg-yellow-900/30 text-yellow-400 rounded-full text-xs">
+                  {projects[selected].status}
+                </span>
+              )}
             </div>
           </div>
           <div className="flex-1 overflow-y-auto text-neutral-200 text-base leading-relaxed px-8 py-6">
-            {projects[selected].description}
+            {projects[selected].description.split('\n').map((line, i) => {
+              const parts = line.split(/(\[[^\]]+\]\([^)]+\))/);
+              return (
+                <p key={i} className="mb-4">
+                  {parts.map((part, j) => {
+                    const linkMatch = part.match(/\[([^\]]+)\]\(([^)]+)\)/);
+                    if (linkMatch) {
+                      return (
+                        <a
+                          key={j}
+                          href={linkMatch[2]}
+                          className="text-green-400 hover:underline"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {linkMatch[1]}
+                        </a>
+                      );
+                    }
+                    return part;
+                  })}
+                </p>
+              );
+            })}
           </div>
-          <a
-            href={projects[selected].link}
-            className="mb-8 mx-8 inline-block text-green-400 hover:underline text-left font-semibold"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            View on GitHub
-          </a>
+          {projects[selected].link && (
+            <a
+              href={projects[selected].link}
+              className="mb-8 mx-8 inline-block text-green-400 hover:underline text-left font-semibold"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {projects[selected].linkText || 'View on GitHub'}
+            </a>
+          )}
         </div>
       )}
 
@@ -228,22 +263,49 @@ export default function Projects() {
                     </span>
                   ))}
                 </div>
-                <span className="inline-block px-2 py-1 bg-yellow-900/30 text-yellow-400 rounded-full text-xs">
-                  {projects[selected].status}
-                </span>
+                {projects[selected].status && (
+                  <span className="inline-block px-2 py-1 bg-yellow-900/30 text-yellow-400 rounded-full text-xs">
+                    {projects[selected].status}
+                  </span>
+                )}
               </div>
             </div>
             <div className="flex-1 overflow-y-auto text-neutral-200 text-base leading-relaxed px-8 py-6">
-              {projects[selected].description}
+              {projects[selected].description.split('\n').map((line, i) => {
+                const parts = line.split(/(\[[^\]]+\]\([^)]+\))/);
+                return (
+                  <p key={i} className="mb-4">
+                    {parts.map((part, j) => {
+                      const linkMatch = part.match(/\[([^\]]+)\]\(([^)]+)\)/);
+                      if (linkMatch) {
+                        return (
+                          <a
+                            key={j}
+                            href={linkMatch[2]}
+                            className="text-green-400 hover:underline"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {linkMatch[1]}
+                          </a>
+                        );
+                      }
+                      return part;
+                    })}
+                  </p>
+                );
+              })}
             </div>
-            <a
-              href={projects[selected].link}
-              className="mb-8 mx-8 inline-block text-green-400 hover:underline text-left font-semibold"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              View on GitHub
-            </a>
+            {projects[selected].link && (
+              <a
+                href={projects[selected].link}
+                className="mb-8 mx-8 inline-block text-green-400 hover:underline text-left font-semibold"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {projects[selected].linkText || 'View on GitHub'}
+              </a>
+            )}
           </div>
         </div>
       )}
