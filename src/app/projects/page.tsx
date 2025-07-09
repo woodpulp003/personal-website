@@ -9,8 +9,8 @@ const projects: Project[] = [
     description: 'UROP project under PI [Prof. Nancy Kanwisher](https://mcgovern.mit.edu/profile/nancy-kanwisher/) and PhD student Bowen Zheng. \n\n Investigated the phenomenon of class selectivity in deeper layers of self-supervised deep learning models [(Konkle et al., 2024)](https://pubmed.ncbi.nlm.nih.gov/39321304/). Used ResNet-18 models trained with Momentum-Contrast (MoCo) on various training datasets to study the activation patterns of the model. Constructed t-maps to find selective units and their variation against model depth and training dataset perturbations.',
     tags: ['Deep Learning', 'Computer Vision', 'Research'],
     image: '/images/vinyl-placeholder-3.png',
-    link: 'https://github.com/yourusername/class-selectivity',
-    linkText: 'Code Upload in Progress',
+    link: 'https://github.com/woodpulp003/cnn-selectivity',
+    linkText: 'View on GitHub',
   },
   {
     title: 'Robust Regression Methods',
