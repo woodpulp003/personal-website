@@ -30,8 +30,8 @@ const projects: Project[] = [
     description: 'Research project replicating findings from [Transformers Represent Belief State Geometry](https://arxiv.org/pdf/2405.15943). \n\n Investigated how LSTM networks represent belief states in their hidden activations when trained on next-token prediction tasks. Demonstrated that belief states are linearly represented in the LSTM hidden states, even in cases where the predicted belief state geometry has highly nontrivial fractal structure. Extended the original work to show that this phenomenon is not unique to transformers but also occurs in other sequence models.',
     tags: ['Deep Learning', 'Research', 'Neural Networks'],
     image: '/images/vinyl-placeholder-1.png',
-    link: 'https://github.com/yourusername/lstm-belief-states',
-    linkText: 'Code Upload in Progress',
+    link: 'https://github.com/woodpulp003/belief-state-geometry',
+    linkText: 'View on GitHub',
   },
   {
     title: 'Primordial Black Holes',
