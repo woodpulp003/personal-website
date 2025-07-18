@@ -203,6 +203,9 @@ export default function NotesPage() {
         <p className="text-neutral-300 text-lg max-w-2xl">
           A collection of courses I&apos;ve taken at MIT, organized by subject area.
         </p>
+        <p className="text-neutral-400 text-sm max-w-2xl italic mt-2">
+          This is a subset of all the classes I have taken. I intend to upload short overview blogs of each coursework listed on this page in due course.
+        </p>
       </div>
 
       {/* Category Filter */}
