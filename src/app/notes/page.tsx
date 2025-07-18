@@ -12,13 +12,13 @@ interface Course {
 }
 
 const courses: Course[] = [
-  // Physics & Mechanics
+  // Physics
   {
     id: '8.033',
     code: '8.033',
     title: 'Relativity I',
     description: 'The Special Theory of Relativity. Relativistic generalizations of Electromagnetism. Introduction to General Theory of Relativity.',
-    category: 'Physics & Mechanics',
+    category: 'Physics',
     color: '#7C3AED'
   },
   {
@@ -26,7 +26,7 @@ const courses: Course[] = [
     code: '8.223',
     title: 'Classical Mechanics II',
     description: 'Lagrangian Formulation of Classical Mechanics.',
-    category: 'Physics & Mechanics',
+    category: 'Physics',
     color: '#7C3AED'
   },
   {
@@ -34,7 +34,7 @@ const courses: Course[] = [
     code: '8.044',
     title: 'Statistical Mechanics I',
     description: 'Statistical mechanics and thermodynamics.',
-    category: 'Physics & Mechanics',
+    category: 'Physics',
     color: '#7C3AED'
   },
   {
@@ -42,7 +42,7 @@ const courses: Course[] = [
     code: '8.05',
     title: 'Quantum Physics II',
     description: 'Linear Algebra formulation of quantum physics.',
-    category: 'Physics & Mechanics',
+    category: 'Physics',
     color: '#7C3AED'
   },
   {
@@ -50,7 +50,7 @@ const courses: Course[] = [
     code: '8.07',
     title: 'Electromagnetism II',
     description: 'Vector formulation of electromagnetic theory.',
-    category: 'Physics & Mechanics',
+    category: 'Physics',
     color: '#7C3AED'
   },
   {
@@ -58,7 +58,7 @@ const courses: Course[] = [
     code: '8.08**',
     title: 'Statistical Mechanics II',
     description: 'Advanced statistical mechanics.',
-    category: 'Physics & Mechanics',
+    category: 'Physics',
     color: '#7C3AED'
   },
   {
@@ -66,7 +66,7 @@ const courses: Course[] = [
     code: '8.962',
     title: 'General Relativity',
     description: 'Graduate level course on modeling spacetime as a manifold, whose curvature is informed by matter.',
-    category: 'Physics & Mechanics',
+    category: 'Physics',
     color: '#7C3AED'
   },
 
@@ -105,14 +105,6 @@ const courses: Course[] = [
     category: 'Computer Science & Algorithms',
     color: '#F472B6'
   },
-  {
-    id: '6.S184',
-    code: '6.S184**',
-    title: 'Introduction to Diffusion Models',
-    description: 'Special topics in diffusion models.',
-    category: 'Computer Science & Algorithms',
-    color: '#F472B6'
-  },
 
   // Statistics & Machine Learning
   {
@@ -120,6 +112,14 @@ const courses: Course[] = [
     code: '6.3700',
     title: 'Introduction to Probability',
     description: 'Fundamental concepts in probability theory.',
+    category: 'Statistics & Machine Learning',
+    color: '#10B981'
+  },
+  {
+    id: '6.S184',
+    code: '6.S184**',
+    title: 'Introduction to Diffusion Models',
+    description: 'Special topics in diffusion models.',
     category: 'Statistics & Machine Learning',
     color: '#10B981'
   },
@@ -175,7 +175,7 @@ const courses: Course[] = [
   }
 ];
 
-const categories = ['All', 'Physics & Mechanics', 'Mathematics', 'Computer Science & Algorithms', 'Statistics & Machine Learning', 'Philosophy & Cognitive Science'];
+const categories = ['All', 'Physics', 'Mathematics', 'Computer Science & Algorithms', 'Statistics & Machine Learning', 'Philosophy & Cognitive Science'];
 
 export default function NotesPage() {
   const [selectedCategory, setSelectedCategory] = useState('All');
