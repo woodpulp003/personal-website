@@ -1,0 +1,151 @@
+Title: Oscillations, Symmetry and Diagonalization
+
+*From a single mass on a spring to a vibrating string, oscillatory systems are often taught in the typical classroom via a sequence of seemingly ad-hoc guesses: exponentials in time, normal modes in space, and Fourier series in the continuum limit. 
+In this essay, we look at oscillations from a linear-operator lens, and use symmetries with which those operators commute to show how diagonalization naturally decouples the dynamics. We show how those familiar solutions arise in a principled fashion.
+The focus throughout is on symmetry, linear algebra and operator structure, making the discussion applicable well beyond mechanics - to spectral methods, linear dynamical systems and kernel methods which are common in Statistics/Machine Learning.*
+
+# 1: Introduction and Motivation)
+
+Anyone that has taken physics in high school or university has likely seen the following equation many times: $$
+\ddot{x}(t) = - \omega^2x(t)
+$$This is the equation of motion of a Simple Harmonic Oscillator (SHO): the acceleration of the particle as a function of time, $\ddot{x}(t)$, is proportional to its displacement from the mean position, $x(t)$, and directed towards the mean position. If you were taught the way I was, the typical treatment is to introduce as a "guess" solution: $$
+x(t) = A \cos(\omega t+\phi)
+$$We check, and indeed, it satisfies the given differential equation. Then the physics teacher would claim "it is the most general solution for an SHO", and the class would proceed to discuss various properties of this solution.
+
+If you are anything like I was in high school, you would be dissatisfied with this business. I was used to solving equations "in a complete manner". When solving a quadratic equation, we **derive** the roots. We complete the square, do some algebra and the two roots emerge inevitably. We don't "guess" the solution... then why should the situation be any different here?
+
+In this blog, I show how linear algebra and symmetry provide a principled framework for understanding oscillatory systems. We first reformulate the SHO as a linear operator equation, and using time-translation invariance we see how exponential solutions emerge as irreducible temporal behaviors of the particle. Next, we extend this same operator-theoretic viewpoint to systems of finitely many coupled oscillators, where the coupling structure leads to normal modes via diagonalization. Lastly, we take the continuum limit of a system of infinitely coupled oscillators that obey spatial translation symmetry, and show that waves on a string arise as simultaneous eigenfunctions of the spatial symmetry generator and the underlying oscillatory operator.
+
+I write this blog to share a few key insights that emerged for me only after revisiting ideas from several courses at MIT. These were concepts that were not immediately obvious or enlightening to me the first time I encountered them, but ones that I have realized in retrospection, once viewed through a unifying lens. I think I would have enjoyed reading such a blog the first time I encountered 8.03, 18.03 or 18.06 simply because I find these abstractions very beautiful and helpful to appreciate the core ideas underlying the subject. 
+
+I have tried to keep this blog to be technically accessible to a first-year undergraduate/advanced high school student. Towards that end, I emphasize the intuition and ideas behind the concepts rather than a fully formal, mathematical treatment. I leave references to resources where the math is discussed more concretely.
+# 2: 1D SHO via linear operator)
+
+## 2.1 The SHO operator)
+As a first step towards a more principled framework to understand oscillations, we look at a single particle oscillating in 1-dimension from an operator viewpoint. 
+
+Informally, an **operator** is a function of functions. It takes in as input a function, and produces as output another function. Define the differential operator $$
+D := \frac{d}{dt}
+$$
+so that our SHO equation $\ddot{x}+\omega^2x=0$ can be written compactly as $$
+(D^{2} + \omega^2 I)x(t) = 0
+$$where I write $I$ to denote $1$, for notational convenience later on. If we define $A := D^2 + \omega^2I$, then our SHO equation can be written simply as $$
+\boxed{Ax=0}
+$$where we view $x$ as a function of time.
+
+The operator $A$ itself is **linear**, meaning that it acts linearly on functions:
+$$
+A(\alpha x_1 + \beta x_2) = \alpha A x_1 + \beta A x_2
+$$
+for all functions $x_1, x_2$ and scalars $\alpha, \beta$.
+
+Note that if $x_1(t)$ and $x_2(t)$ both represent valid motions of the particle, then any linear combination $\alpha x_1(t) + \beta x_2(t)$, with constants $\alpha, \beta$, is also a valid solution. Thus, the set of solutions is closed under linear combinations, and therefore forms a vector space!
+
+This is the first perspective shift I would like to emphasize. Rather than thinking of $x(t)$ as a literal distance, we instead treat it as an abstract function that takes a time $t$ as input and returns a real number. Further, these functions inhabit a vector space and behave just like vectors. From this viewpoint, solving the simple harmonic oscillator amounts to finding all functions that lie in the **null space (or kernel)** of the linear operator $A$. This sounds much more like a linear algebra problem!
+
+Recall that in solving a matrix nullspace problem $Mv=0$, we would do typically do Gaussian elimination or row reduction to find out a set of linearly independent vectors $\{ v_{i} \}$ that span the nullspace of the matrix $M$. Then, the most general solution is some linear combination: $$
+v = \sum_{i}c_{i}v_{i}
+$$where the $c_{i}$ are constants. 
+
+To solve our SHO equation, we will try doing something similar, but here we have two important differences:
+1) We are working in the vector space of arbitrary functions $x(t)$, which is an infinite dimensional vector space!
+2) Our linear operator $A$ isn't a matrix with concrete numbers. It has the $D^2$ operator within it.
+
+Regardless, the core idea remains the same: finding a set of independent vectors $\{ x_{i} \}$ that span the nullspace of the linear operator $A$ will give us a general solution to the SHO equation. We deal with these differences one-by-one.
+
+## 2.2 Dimension of nullspace)
+
+First, we show that the dimension of the nullspace of $A$ is $2$ via a bijection to $\mathbb{R}^2$. So, we need not be concerned with the entire infinite-dimensional space of functions; we are only interested in a $2-$dimensional subspace of this vector space of all functions.
+
+We know that two initial conditions are required to fully specify the motion of the particle in SHO, typically the initial displacement $x(0)$ and the initial velocity $\dot{x}(0)$. One way of seeing why this fully constrains the particles motion for all time is the following: if we fix $x(0)$ and $\dot{x}(0)$ then all higher order derivatives at $t=0$ are fixed too: the second derivative is $\ddot{x}(0)=-\omega^2x(0)$, and the third derivative is $\dot{(\ddot{x})}(0) = -\omega^2\dot{x}(0)$, and so on. Then, by Taylor's expansion around $t=0$ $$
+x(t) = x(0) + \dot{x}(0) t + \ddot{x}(0) \frac{t^2}{2} + \dots 
+$$As all the higher-order derivatives at $t=0$ are all fixed, so $x(t)$ is fixed (fixing all orders of derivatives of any arbitrary function $x(t)$ at a particular time fully determines the function).
+
+One obvious fact that needs to be stated for completion: given any $x(t)$, there is a unique $x(0)$ and $\dot{x}(0)$. 
+
+Thus, we showed that given a particular $(x(0), \dot{x}(0))$ we obtain a unique $x(t)$, and given a particular $x(t)$ we get a unique $(x(0), \dot{x}(0))$. Thus, there is a **bijection**: $\text{solution to SHO} \leftrightarrow (x(0), \dot{x}(0))$. Further, this is a linear map $$x_{1}(t) + x_{2}(t) \leftrightarrow (x_{1}(0) + x_{2}(0), \dot{x}_{1}(0) + \dot{x}_{2}(0))$$A bijective, linear map is an **isomorphism**, implying that the dimension of the spaces related by this map are the same (isomorphism literally means same-shape). So, the dimension of the nullspace of $A$ is the dimension of the space inhabited by all such pairs $(x(0), \dot{x}(0))$. Clearly, any two real numbers can be valid initial conditions, so this space is $\mathbb{R}^2$, which has dimension $2$. So, the dimension of nullspace of $A$ is 2.
+
+This yields another beautiful picture that I wish to emphasize: each solution to the SHO $x(t)$ is indexable by a unique vector on the real number plane $\mathbb{R}^2$ that specifies its initial conditions $(x(0), \dot{x}(0))$. Further, choosing $t=0$ to establish this bijection was arbitrary; you could take any $(x(t'), \dot{x}(t'))$ to index the path $x(t)$ by a similar analysis as above. The set of all such points $(x(t'), \dot{x}(t'))$ thus correspond to the same trajectory $x(t)$, and as you slide through all values of $t'$, we get a "trajectory" on $\mathbb{R}^2$ traced by this particle. You might have already seen this as the **phase-space picture** of the SHO.
+
+
+## 2.3 Finding two basis vectors
+Having proved that the nullspace of $A$ is $2-$dimensional, we thus need to find only two independent functions $x_{1}(t), x_{2}(t)$ to write down a general solution: any $x(t)$ in the nullspace would be some linear combination of these two. 
+
+In linear algebra, it often helps to reorient ourselves to a convenient basis. The same problem that is very difficult in the default basis can become very simple if you exploit the structure of the matrix in question to perform a basis change. 
+
+So let's take a closer look at our linear operator $A$: $$
+A = D^2 + \omega^2 I
+$$and specifically, let's focus on the operator $D$. 
+One key property of $D$ is that it **commutes with time translation**. This is just a formal way of saying $$\underbrace{ \dot{x}(t+\Delta t) }_{ \text{evaluate the derivative of } x  \text{ at shifted time}}= \left( \frac{d}{dt}x \right)(t+\Delta t)= \frac{d}{dt}(x(t+\Delta t)) = \underbrace{ \dot{(x(t+\Delta t))} }_{ \text{shift }x(t) \text{, then take derivative}}$$but understanding this symmetry better will be very helpful later on. 
+
+Symmetry is described mathematically by members of some symmetry group. When I say that $D$ obeys a symmetry in time, I mean that $D$ interacts in a certain fashion with elements of the symmetry group of time translations. In general, we can label a time translation by the amount of shift $\Delta t$ it causes $$
+\text{time shift of }\Delta t \leftrightarrow T_{\Delta t}
+$$These $T_{\Delta t}$ can also be represented as **operators** on our vector space of functions (i.e. this is one of the *representations* of our symmetry group). Their action on any $x(t)$ is $$
+T_{\Delta t}x(t) = x(t+\Delta t)
+$$i.e. a mapping from the function $x(t)$ to $x(t+\Delta t)$. Note that $T_{\Delta t}$ is also a linear operator.
+
+Note that $D$ commutes with any such $T_{\Delta t}$ $$
+DT_{\Delta t} = T_{\Delta t}D
+$$which we compactly write as $[D, T_{\Delta t}]=0$. This can be seen explicitly by the action on any $x(t)$ 
+$$
+\begin{align}
+D(T_{\Delta t} x(t)) =D (x(t+\Delta t))   &= \dot{(x(t+\Delta t))}  \\
+T_{\Delta t}(Dx(t)) = T_{\Delta t}(\dot{x}(t)) &= \dot{x}(t+\Delta t)
+\end{align}
+$$
+
+Similarly, $D^2$ also commutes with time translations $T_{\Delta t}$: $[D^2, T_{\Delta t}]$ and consequently, as $A = D^2 + \omega^2I$, $$
+[A, T_{\Delta t}] = 0
+$$because $\omega^2I$ commutes with any operator (its just a scalar times the identity operator).
+
+Now, the key step that will justify all this hard work: $$
+\text{linear operators that commute have the same eigenfunctions}
+$$That sounds like a mouthful, but is a key result taught in Quantum Mechanics and Linear Algebra courses. To break it down, I discuss below the underlying intuitive picture. 
+
+In this context, **eigenfunctions** are simply the solutions to operator equations, akin to **eigenvectors** in finite-dimensional spaces. If a linear operator $M$ has an eigenfunction $v$ with eigenvalue $\lambda$, then $$
+Mv = \lambda v
+$$So, applying the operator $M$ to the eigenfunction $v$ results in the function being **scaled** by the eigenvalue $\lambda$. Importantly, eigenfunctions are **directions** (in the function space) that remain unchanged except for scaling when acted upon by $M$. This is not true for a general function. For example, if $M$ has eigenfunctions $v_{1}$ and $v_{2}$ with distinct eigenvalues $\lambda_{1}$ and $\lambda_{2}$, then $$
+M(c_{1}v_{1} + c_{2}v_{2}) = \lambda_{1}c_{1}v_{1} + \lambda_{2}c_{2}v_{2} \cancel\propto (c_{1}v_{1} + c_{2}v_{2})
+$$unless one of $c_{1}$ or $c_{2}$ is zero. *Eigenfunctions are special directions where the action of the operator is simple scaling.*
+
+Our claim is that if two operators commute, then these directions align. The full proof is found in the references, but I prove it for the case where these operators don't have degenerate eigenvalue (i.e. for each eigenvalue, there is a unique associated direction). Let $M_{1}$ and $M_{2}$ commute, and take any eigenfunction $v_{1}$ of $M_{1}$ with eigenvalue $\lambda_{1}$. Here, I will assume that $v_{1}$ is the only eigenfunction of $M_{1}$ with the  Then $$
+M_{2}M_{1}v_{1} = M_{1}M_{2}v_{1}
+$$as $[M_{1},M_{2}]=0$. But then $$
+M_{2}(M_{1}v_{1}) = M_{2}(\lambda_{1}v_{1}) = \lambda_{1} (M_{2}v_{1}) = M_{1} (M_{2}v_{1})
+$$so, $M_{2}v_{1}$ is also an eigenfunction of $M_{1}$ with eigenvalue $\lambda_{1}$. But as these are non-degenerate operators, $M_{2}v_{1}$ must be in the same direction as $v_{1}$, and so for some constant $\lambda_{2}$ $$
+M_{2}v_{1} = \lambda_{2}v_{1}
+$$so, $v_{1}$ is also an eigenfunction of $M_{2}$. 
+
+The underlying picture is this: because $M_{1}$ and $M_{2}$ commute, the order in which you apply them to an eigenfunction of either of these operator does not matter, as they both simply scale that eigenfunction. Their actions on these common directions do not interfere.
+
+Going back to our SHO problem, as $A$ commutes with $T_{\Delta t}$, we must have that any eigenfunction of $A$ is also an eigenfunction of $T_{\Delta t}$. As we are interested in finding $2$ distinct functions in the nullspace of $A$: $$
+Ax=0
+$$
+This is equivalent to finding two distinct eigenfunctions of $A$ with eigenvalue $0$. And using the result on commuting operators, **all eigenfunctions of $A$ are eigenfunctions of $T_{\Delta t}$!**
+
+The eigenfunctions of the time-translation operator $T_{\Delta t}$ are much more fundamental objects, and yield a much more satisfying answer to why they are eigenfunctions of time-translation in the first place, as we see below. 
+
+We seek functions $f(t)$ such that $T_{\Delta t}f =\lambda f$ for some $\lambda \in \mathbb{C}$, the set of complex numbers. We use complex numbers instead of real numbers because they are algebraically closed, meaning that we need not be concerned when we solve the eigenvalue problem (which, in general, gives a polynomial in $\lambda$).  $$
+T_{\Delta t}f = f(t+\Delta t) = \lambda f(t)
+$$This already makes the answer fairly clear, but I finish the derivation for completeness. Taking $\Delta t \to dt$, this gives us a differential equation for $f(t)$ $$
+\frac{df(t)}{f(t)} = (\lambda-1)dt\implies f(t) = f(0)e^{(\lambda-1)t}
+$$Thus, the eigenfunctions of the time-translation operator are exponentials!
+
+It is very satisfactory to see this result: exponentials are such functions that if you shift their argument by $\Delta t$, you scale the function by $e^{s\Delta t}$ for some constant $s \in \mathbb{C}$. Exponentials are the unique class of functions that survive (i.e. are scaled and don't change direction) under action by translation!
+
+
+Now that we know that all eigenfunctions of $T_{\Delta t}$ are exponentials, and that all eigenfunctions of $A$ are eigenfunctions of $T_{\Delta t}$, then all that remains to find is two distinct exponentials that lie in the nullspace of $A$. This brings us to the place where most college courses start: plug in $e^{st}$ as a guess solution, where $s \in \mathbb{C}$. $$
+Ae^{st}=0 \implies (D^2+\omega^2I)e^{st}=0 \implies (s^2+\omega^2)e^{st} = 0 \implies \boxed{s = \pm i\omega}
+$$
+Thus, any general solution $x(t)$ to the SHO equation can be written as a linear combination of these two nullspace-spanning eigenfunctions $$
+x(t) = C_{1} e^{i\omega t} + C_{2}e^{-i\omega t}
+$$As we are dealing with functions that are physically meaningful as displacements of the particle, we only consider those linear combinations that result in a real value at all times $t$. 
+
+
+
+
+
+
+
+
+

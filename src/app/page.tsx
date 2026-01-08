@@ -202,20 +202,60 @@ const MountainTrees = ({ mountainColor, mountainHeight, scrollFactor, treeZIndex
 
 export default function Home() {
   const [scrollY, setScrollY] = useState(0);
-  const [sunPosition, setSunPosition] = useState({ top: '16px', left: '50%', visible: false });
-  const [moonPosition, setMoonPosition] = useState({ top: '16px', left: '50%', visible: false });
+  // Calculate initial arcCenterY based on window height (or default if SSR)
+  const getInitialArcCenterY = () => typeof window !== 'undefined' ? window.innerHeight / 2 : 400;
+  const [arcCenterY, setArcCenterY] = useState(getInitialArcCenterY);
+  
+  // Helper function to calculate celestial positions
+  const calculateCelestialPositions = (centerY: number) => {
+    const now = performance.now();
+    const currentTimeMs = Date.now() % 120000;
+    const fastMinutes = ((now / 1000 + currentTimeMs / 1000) % 120) / 120 * 1440;
+    const dayProgress = fastMinutes / 1440;
+    const sunAngle = dayProgress * 2 * Math.PI - Math.PI / 2;
+    const moonAngle = sunAngle + Math.PI;
+    const arcRadius = centerY * 0.7;
+    
+    const sunTop = centerY - arcRadius * Math.sin(sunAngle);
+    const sunLeft = 50 + 35 * Math.cos(sunAngle);
+    const moonTop = centerY - arcRadius * Math.sin(moonAngle);
+    const moonLeft = 50 + 35 * Math.cos(moonAngle);
+    
+    return {
+      sun: {
+        top: `${sunTop}px`,
+        left: `${sunLeft}%`,
+        visible: sunTop < centerY
+      },
+      moon: {
+        top: `${moonTop}px`,
+        left: `${moonLeft}%`,
+        visible: moonTop < centerY
+      }
+    };
+  };
+  
+  // Initialize sun/moon positions correctly from the start
+  const initialPositions = calculateCelestialPositions(arcCenterY);
+  const [sunPosition, setSunPosition] = useState(initialPositions.sun);
+  const [moonPosition, setMoonPosition] = useState(initialPositions.moon);
   const [isNight, setIsNight] = useState(false);
   const [farMountainColor, setFarMountainColor] = useState('#9095b3'); // Default to Alto's day color
   const [middleMountainColor, setMiddleMountainColor] = useState('#7a7f9e'); // Default to Alto's day color
   const [closeMountainColor, setCloseMountainColor] = useState('#6a6b85'); // Default to Alto's day color
   const [skyColor, setSkyColor] = useState('#87ceeb');
-  const [arcCenterY, setArcCenterY] = useState(400); // Default value
   const [showCopied, setShowCopied] = useState(false);
 
   // Add useEffect to handle window dimensions
   useEffect(() => {
     const updateDimensions = () => {
-      setArcCenterY(window.innerHeight / 2);
+      const newCenterY = window.innerHeight / 2;
+      setArcCenterY(newCenterY);
+      
+      // Immediately set initial sun/moon positions to avoid janky effect
+      const positions = calculateCelestialPositions(newCenterY);
+      setSunPosition(positions.sun);
+      setMoonPosition(positions.moon);
     };
     
     // Set initial dimensions
