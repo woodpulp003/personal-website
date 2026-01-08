@@ -271,9 +271,9 @@ $$
   }
 };
 
-export default function BlogPost({ params }: { params: { slug: string } | Promise<{ slug: string }> }) {
-  // Handle both sync and async params (Next.js 15 compatibility)
-  const resolvedParams = 'then' in params ? use(params) : params;
+export default function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
+  // In Next.js 15, params is always a Promise
+  const resolvedParams = use(params);
   const post = blogPosts[resolvedParams.slug];
 
   if (!post) {
