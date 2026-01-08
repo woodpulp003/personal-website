@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
 
@@ -34,6 +34,20 @@ function lerpColor(a: string, b: string, t: number) {
   const rg = Math.round(ag + (bg - ag) * t);
   const rb = Math.round(ab + (bb - ab) * t);
   return `#${rr.toString(16).padStart(2, '0')}${rg.toString(16).padStart(2, '0')}${rb.toString(16).padStart(2, '0')}`;
+}
+
+// Helper: darken a hex color by a factor (0-1)
+function darkenColor(color: string, factor: number = 0.3) {
+  const hex = color.replace('#', '');
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+  
+  const newR = Math.max(0, Math.floor(r * (1 - factor)));
+  const newG = Math.max(0, Math.floor(g * (1 - factor)));
+  const newB = Math.max(0, Math.floor(b * (1 - factor)));
+  
+  return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
 }
 
 // Add seeded random number generator
@@ -95,32 +109,66 @@ const StarField = ({ isNight, scrollY }: { isNight: boolean, scrollY: number }) 
 };
 
 // Component to render geometric trees on mountains
-const MountainTrees = ({ colorClass, mountainHeight, scrollFactor }: { colorClass: string, mountainHeight: string, scrollFactor: number }) => {
+const MountainTrees = ({ mountainColor, mountainHeight, scrollFactor, treeZIndex = 10 }: { mountainColor: string, mountainHeight: string, scrollFactor: number, treeZIndex?: number }) => {
   const [trees, setTrees] = useState<Array<{ id: number, style: CSSProperties }>>([]);
   const [scrollY, setScrollY] = useState(0);
 
   // Effect to generate trees only on the client after mount
   useEffect(() => {
-    const random = mulberry32(5); // Use seed 123 for trees
-    const generatedTrees = Array.from({ length: 12 }).map((_, i) => {
-      const height = random() * 30 + 40; // Height between 40-70px
+    // Use different seeds for different mountain layers based on height
+    const seed = mountainHeight === '60vh' ? 123 : mountainHeight === '50vh' ? 456 : 789;
+    const random = mulberry32(seed);
+    
+    // Generate trees with arc distribution (denser at edges)
+    const treeCount = 30; // Increased count for better coverage
+    const generatedTrees: Array<{ id: number, style: CSSProperties }> = [];
+    
+    for (let i = 0; i < treeCount; i++) {
+      // Create arc distribution: more density at edges (0% and 100%), less in middle (50%)
+      // Use a U-shaped distribution
+      let leftPercent: number;
+      const rand = random();
+      
+      // 60% chance to be in edge regions (0-30% or 70-100%), 40% in middle (30-70%)
+      if (rand < 0.3) {
+        // Left edge: 0-30%
+        leftPercent = random() * 30;
+      } else if (rand < 0.6) {
+        // Right edge: 70-100%
+        leftPercent = 70 + random() * 30;
+      } else {
+        // Middle: 30-70% (less dense)
+        leftPercent = 30 + random() * 40;
+      }
+      
+      // Add some randomness to make it look natural
+      leftPercent += (random() - 0.5) * 5; // Add ±2.5% jitter
+      leftPercent = Math.max(5, Math.min(95, leftPercent)); // Clamp between 5-95%
+      
+      // Height based on position: taller at edges, smaller in middle
+      // Distance from center (50%) determines height
+      const distanceFromCenter = Math.abs(leftPercent - 50) / 50; // 0 at center, 1 at edges
+      const baseHeight = 30 + distanceFromCenter * 40; // 30px at center, 70px at edges
+      const heightVariation = (random() - 0.5) * 20; // ±10px random variation
+      const height = Math.max(25, Math.min(80, baseHeight + heightVariation));
+      
       const width = height * 0.5; // Width is 50% of height
-      const left = random() * 85 + 7.5; // Position between 7.5-92.5% of width
       const bottom = random() * 25 + 5; // Position between 5-30% from bottom
       
-      return {
+      generatedTrees.push({
         id: i,
         style: {
           position: 'absolute' as CSSProperties['position'],
-          left: `${left}%`,
+          left: `${leftPercent}%`,
           bottom: `${bottom}%`,
           width: `${width}px`,
           height: `${height}px`,
           clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)',
           transition: 'background-color 1s ease-in-out',
         }
-      };
-    });
+      });
+    }
+    
     setTrees(generatedTrees);
 
     // Add scroll listener for parallax effect
@@ -132,15 +180,19 @@ const MountainTrees = ({ colorClass, mountainHeight, scrollFactor }: { colorClas
 
   }, [mountainHeight]);
 
+  // Darken the mountain color for trees to make them visible
+  const treeColor = darkenColor(mountainColor, 0.25);
+
   return (
-    <div className="absolute inset-0 z-10">
+    <div className="absolute inset-0" style={{ zIndex: treeZIndex }}>
       {trees.map((tree) => (
         <div
           key={tree.id}
-          className={`absolute ${colorClass}`}
+          className="absolute"
           style={{
             ...tree.style,
-            transform: `translateY(${scrollY * scrollFactor}px) translateX(-50%)` // Apply parallax and center
+            backgroundColor: treeColor, // Use darkened mountain color for visibility
+            transform: `translateY(${scrollY * scrollFactor}px)`, // Remove translateX(-50%) to fix positioning
           }}
         />
       ))}
@@ -395,7 +447,6 @@ export default function Home() {
             transform: `translateY(${scrollY * 0.1}px)`,
           }}
         >
-          <MountainTrees colorClass="bg-alto-tree-day" mountainHeight="60vh" scrollFactor={0.1} />
         </div>
         {/* Middle Mountains */}
         <div
@@ -411,7 +462,6 @@ export default function Home() {
             transform: `translateY(${scrollY * 0.2}px)`
           }}
         >
-          <MountainTrees colorClass="bg-alto-tree-day" mountainHeight="50vh" scrollFactor={0.2} />
         </div>
         {/* Close Mountains */}
         <div
@@ -428,7 +478,7 @@ export default function Home() {
             zIndex: 10,
           }}
         >
-          <MountainTrees colorClass="bg-alto-tree-day" mountainHeight="40vh" scrollFactor={0.3} />
+          <MountainTrees mountainColor={closeMountainColor} mountainHeight="40vh" scrollFactor={0.3} treeZIndex={17} />
         </div>
       </div>
 

@@ -1,7 +1,5 @@
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
-import { usePathname } from 'next/navigation';
 import './globals.css';
 import Navigation from "../components/Navigation";
 
@@ -10,28 +8,15 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
-
   return (
     <html lang="en">
       <body className="bg-black">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={pathname}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ 
-              duration: 0.3,
-              ease: "easeInOut"
-            }}
-          >
-            <Navigation />
-            <main className="min-h-screen">
-              {children}
-            </main>
-          </motion.div>
-        </AnimatePresence>
+        <div>
+          <Navigation />
+          <main className="min-h-screen">
+            {children}
+          </main>
+        </div>
       </body>
     </html>
   );
